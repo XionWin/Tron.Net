@@ -17,8 +17,8 @@ namespace Tron.Hardware
 
         #region Functions
 
-        bool Begin();
-        void End();
+        // bool Begin();
+        // void End();
 
         byte ReadByte(byte address);
         I2CReasonCodes WriteByte(byte address, byte value);
@@ -34,17 +34,18 @@ namespace Tron.Hardware
     {
         #region Fields
         private byte _slaveAddress = 0x00;
-        private I2CClockDivider _clockDivider = I2CClockDivider.CLOCK_DIVIDER_150;
+        private I2CClockDivider _clockDivider = I2CClockDivider.CLOCK_DIVIDER_250;
         private uint _baudrate = 0;
         private byte[] _addr_buffer = new byte[1];
         private byte[] _byte_buffer = new byte[2];
         #endregion
 
-        public I2C(byte slaveAddress)
+        // private static bool _isInited = false;
+        public I2C(byte slaveAddress, I2CClockDivider clockDivider)
         {
             this.Begin();
             this.SlaveAddress = slaveAddress;
-            BCM2835_I2C.SetClockDivider(this._clockDivider);
+            this.ClockDivider = clockDivider;
         }
 
         #region Implement II2C
@@ -106,6 +107,7 @@ namespace Tron.Hardware
         public byte ReadByte(byte address)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
 
             this._addr_buffer[0] = address;
             if (BCM2835_I2C.ReadRegister(this._addr_buffer, this._byte_buffer, 1) != I2CReasonCodes.REASON_OK)
@@ -117,6 +119,7 @@ namespace Tron.Hardware
         public I2CReasonCodes WriteByte(byte address, byte value)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
 
             this._byte_buffer[0] = address;
             this._byte_buffer[1] = value;
@@ -126,6 +129,7 @@ namespace Tron.Hardware
         public I2CReasonCodes Read(byte addr, byte[] buf)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
             
             this._addr_buffer[0] = addr;
             if (BCM2835_I2C.Write(this._addr_buffer, this._addr_buffer.Length) != I2CReasonCodes.REASON_OK)
@@ -137,12 +141,14 @@ namespace Tron.Hardware
         public I2CReasonCodes Write(byte[] buf)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
             
             return BCM2835_I2C.Write(buf, buf.Length);
         }
         public I2CReasonCodes ReadRegister(byte[] regaddr, byte[] buf)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
             
             return BCM2835_I2C.ReadRegister(regaddr, buf, buf.Length);
         }
@@ -150,6 +156,7 @@ namespace Tron.Hardware
         public I2CReasonCodes WriteReadRegister(byte[] cmds, byte[] buf)
         {
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            BCM2835_I2C.SetClockDivider(this.ClockDivider);
             
             return BCM2835_I2C.WriteReadRegister(cmds, cmds.Length, buf, buf.Length);
         }

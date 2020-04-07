@@ -16,6 +16,13 @@ namespace Quadcopter
                 throw new Exception("Unable to initialize bcm2835.so library");
             MachineInfo.Show();
 
+
+            Tron.Hardware.Library.Delay(100);
+            Tron.Hardware.BCM2835_I2C.End();
+            Tron.Hardware.Library.Delay(1000);
+            Tron.Hardware.BCM2835_I2C.Begin();
+            Tron.Hardware.Library.Delay(100);
+
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
             {
                 Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250();
@@ -36,6 +43,7 @@ namespace Quadcopter
 
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
 
+                DateTime lastUpdate = DateTime.Now;
                 while (true)
                 {
                     var start = DateTime.Now;
@@ -50,9 +58,13 @@ namespace Quadcopter
 #endif
                         // System.Console.WriteLine(i);
                         mpu.Read();
-                        Tron.Hardware.Library.Delay(1);
+                        // Tron.Hardware.Library.Delay(1);
                     }
-                    System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    {
+                        System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                        lastUpdate = DateTime.Now;
+                    }
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_PCA9685
@@ -62,7 +74,7 @@ namespace Quadcopter
                         }
 #endif
                         // System.Console.WriteLine(i);
-                        Tron.Hardware.Library.Delay(20);
+                        // Tron.Hardware.Library.Delay(20);
                     }
 #if ENABLE_PCA9685
 

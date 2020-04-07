@@ -22,7 +22,7 @@ namespace Tron.Device
         private byte _sleep_data = 0x00;
         public PCA9685(IEnumerable<Channel> channels)
         {
-            this.BUS = new Hardware.I2C(PCA9685.ADDRESS);
+            this.BUS = new Hardware.I2C(PCA9685.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_250);
             this.Channels = channels;
             Init();
         }

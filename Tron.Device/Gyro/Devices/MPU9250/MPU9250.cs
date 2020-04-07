@@ -7,7 +7,7 @@ namespace Tron.Device.Gyro
         private const byte ADDRESS = 0x68;
         public MPU9250()
         {
-            this.BUS = new Hardware.I2C(MPU9250.ADDRESS);
+            this.BUS = new Hardware.I2C(MPU9250.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
         }
         byte[] _buf = new byte[6];
         public void Read()
