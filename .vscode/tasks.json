@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "dependsOn": [
+                "copy"
+            ]
+        },
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Quadcopter/Quadcopter.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "copy",
+            "command": "scp",
+            "type": "shell",
+            "args": [
+                "${workspaceFolder}/Quadcopter/bin/Debug/netcoreapp3.1/*",
+                "pi@192.168.0.22:/home/pi/share/bin"
+            ],
+            "dependsOn": [
+                "build",
+            ]
+        }
+    ]
+}

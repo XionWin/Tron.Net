@@ -1,0 +1,28 @@
+{
+   // Use IntelliSense to find out which attributes exist for C# debugging
+   // Use hover for the description of the existing attributes
+   // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+   "version": "0.2.0",
+   "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "Build",
+            "program": "/opt/dotnet/dotnet",
+            "args": ["/home/pi/share/bin/Quadcopter.dll"],
+            // "cwd": "${workspaceRoot}", 
+            "console": "internalConsole",
+            "stopAtEntry": false,
+			"pipeTransport": {
+				"pipeCwd": "${workspaceRoot}",
+				"pipeProgram": "ssh",
+				"pipeArgs": [
+					"-T",
+                    "pi@192.168.0.22"
+				],
+				"debuggerPath": "sudo ~/.vsdbg/vsdbg"
+			}
+        }
+    ]
+}
