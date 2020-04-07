@@ -1,9 +1,0 @@
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.csprojAssemblyReference.cache
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.csproj.CoreCompileInputs.cache
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.AssemblyInfoInputs.cache
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.AssemblyInfo.cs
-/mnt/d/Tron.Net/Tron.Linux/bin/Debug/netstandard2.0/Tron.Linux.deps.json
-/mnt/d/Tron.Net/Tron.Linux/bin/Debug/netstandard2.0/Tron.Linux.dll
-/mnt/d/Tron.Net/Tron.Linux/bin/Debug/netstandard2.0/Tron.Linux.pdb
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.dll
-/mnt/d/Tron.Net/Tron.Linux/obj/Debug/netstandard2.0/Tron.Linux.pdb
