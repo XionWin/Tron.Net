@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "EAhTEnhv+3+6lPVu7D3yp8Re2t9AQR2BH7yqZ2LEtaTh3MfbzgPb/S2Vi0AejAfw9hsQ1pkaCQoebGyxlXhCrw==",
+  "success": true,
+  "projectFilePath": "/mnt/d/Tron.Net/Tron.Drawing/Tron.Drawing.csproj",
+  "expectedPackageFiles": [
+    "/home/win/.nuget/packages/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "/home/win/.nuget/packages/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

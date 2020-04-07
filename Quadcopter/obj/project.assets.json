@@ -1,0 +1,168 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "Tron.Core/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Tron.Core.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tron.Core.dll": {}
+        }
+      },
+      "Tron.Device/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "Tron.Hardware": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Tron.Device.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tron.Device.dll": {}
+        }
+      },
+      "Tron.Drawing/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Tron.Drawing.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tron.Drawing.dll": {}
+        }
+      },
+      "Tron.Hardware/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "Tron.Core": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Tron.Hardware.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tron.Hardware.dll": {}
+        }
+      },
+      "Tron.Linux/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Tron.Linux.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tron.Linux.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Tron.Core/1.0.0": {
+      "type": "project",
+      "path": "../Tron.Core/Tron.Core.csproj",
+      "msbuildProject": "../Tron.Core/Tron.Core.csproj"
+    },
+    "Tron.Device/1.0.0": {
+      "type": "project",
+      "path": "../Tron.Device/Tron.Device.csproj",
+      "msbuildProject": "../Tron.Device/Tron.Device.csproj"
+    },
+    "Tron.Drawing/1.0.0": {
+      "type": "project",
+      "path": "../Tron.Drawing/Tron.Drawing.csproj",
+      "msbuildProject": "../Tron.Drawing/Tron.Drawing.csproj"
+    },
+    "Tron.Hardware/1.0.0": {
+      "type": "project",
+      "path": "../Tron.Hardware/Tron.Hardware.csproj",
+      "msbuildProject": "../Tron.Hardware/Tron.Hardware.csproj"
+    },
+    "Tron.Linux/1.0.0": {
+      "type": "project",
+      "path": "../Tron.Linux/Tron.Linux.csproj",
+      "msbuildProject": "../Tron.Linux/Tron.Linux.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETCoreApp,Version=v3.1": [
+      "Tron.Core >= 1.0.0",
+      "Tron.Device >= 1.0.0",
+      "Tron.Drawing >= 1.0.0",
+      "Tron.Hardware >= 1.0.0",
+      "Tron.Linux >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "/home/win/.nuget/packages/": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "/mnt/CORSAIR/projects/Tron.Net/Quadcopter/Quadcopter.csproj",
+      "projectName": "Quadcopter",
+      "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Quadcopter/Quadcopter.csproj",
+      "packagesPath": "/home/win/.nuget/packages/",
+      "outputPath": "/mnt/CORSAIR/projects/Tron.Net/Quadcopter/obj/",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "/home/win/.nuget/NuGet/NuGet.Config"
+      ],
+      "originalTargetFrameworks": [
+        "netcoreapp3.1"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "projectReferences": {
+            "/mnt/CORSAIR/projects/Tron.Net/Tron.Core/Tron.Core.csproj": {
+              "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Tron.Core/Tron.Core.csproj"
+            },
+            "/mnt/CORSAIR/projects/Tron.Net/Tron.Device/Tron.Device.csproj": {
+              "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Tron.Device/Tron.Device.csproj"
+            },
+            "/mnt/CORSAIR/projects/Tron.Net/Tron.Drawing/Tron.Drawing.csproj": {
+              "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Tron.Drawing/Tron.Drawing.csproj"
+            },
+            "/mnt/CORSAIR/projects/Tron.Net/Tron.Hardware/Tron.Hardware.csproj": {
+              "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Tron.Hardware/Tron.Hardware.csproj"
+            },
+            "/mnt/CORSAIR/projects/Tron.Net/Tron.Linux/Tron.Linux.csproj": {
+              "projectPath": "/mnt/CORSAIR/projects/Tron.Net/Tron.Linux/Tron.Linux.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "netcoreapp3.1": {
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/3.1.201/RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

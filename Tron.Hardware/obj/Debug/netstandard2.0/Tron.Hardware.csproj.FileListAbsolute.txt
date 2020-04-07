@@ -1,0 +1,12 @@
+/mnt/d/Tron.Net/Tron.Hardware/bin/Debug/netstandard2.0/Tron.Hardware.deps.json
+/mnt/d/Tron.Net/Tron.Hardware/bin/Debug/netstandard2.0/Tron.Hardware.dll
+/mnt/d/Tron.Net/Tron.Hardware/bin/Debug/netstandard2.0/Tron.Hardware.pdb
+/mnt/d/Tron.Net/Tron.Hardware/bin/Debug/netstandard2.0/Tron.Core.dll
+/mnt/d/Tron.Net/Tron.Hardware/bin/Debug/netstandard2.0/Tron.Core.pdb
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.csprojAssemblyReference.cache
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.csproj.CoreCompileInputs.cache
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.AssemblyInfoInputs.cache
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.AssemblyInfo.cs
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.csproj.CopyComplete
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.dll
+/mnt/d/Tron.Net/Tron.Hardware/obj/Debug/netstandard2.0/Tron.Hardware.pdb

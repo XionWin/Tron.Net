@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "e2XAcJ2LyHWJyQ5EaUsi9JRXwoP95UEyE+dZzf3+ws0RDy0IOGqcYFPqjxz4Do1E87+TjxLuo+0HX26x0rPblw==",
+  "success": true,
+  "projectFilePath": "/mnt/d/Tron.Net/Tron.Device/Tron.Device.csproj",
+  "expectedPackageFiles": [
+    "/home/win/.nuget/packages/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "/home/win/.nuget/packages/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

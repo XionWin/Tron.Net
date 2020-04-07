@@ -1,0 +1,9 @@
+/mnt/d/Tron.Net/Tron.Drawing/bin/Debug/netstandard2.0/Tron.Drawing.deps.json
+/mnt/d/Tron.Net/Tron.Drawing/bin/Debug/netstandard2.0/Tron.Drawing.dll
+/mnt/d/Tron.Net/Tron.Drawing/bin/Debug/netstandard2.0/Tron.Drawing.pdb
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.csprojAssemblyReference.cache
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.csproj.CoreCompileInputs.cache
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.AssemblyInfoInputs.cache
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.AssemblyInfo.cs
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.dll
+/mnt/d/Tron.Net/Tron.Drawing/obj/Debug/netstandard2.0/Tron.Drawing.pdb

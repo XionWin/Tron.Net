@@ -1,0 +1,14 @@
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Device.deps.json
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Device.dll
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Device.pdb
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Core.dll
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Hardware.dll
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Hardware.pdb
+/mnt/d/Tron.Net/Tron.Device/bin/Debug/netstandard2.0/Tron.Core.pdb
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.csprojAssemblyReference.cache
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.csproj.CoreCompileInputs.cache
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.AssemblyInfoInputs.cache
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.AssemblyInfo.cs
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.csproj.CopyComplete
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.dll
+/mnt/d/Tron.Net/Tron.Device/obj/Debug/netstandard2.0/Tron.Device.pdb
