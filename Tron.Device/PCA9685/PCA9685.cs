@@ -20,8 +20,9 @@ namespace Tron.Device
 
 
         private byte _sleep_data = 0x00;
-        public PCA9685(Hardware.II2C i2c, IEnumerable<Channel> channels) : base(i2c)
+        public PCA9685(IEnumerable<Channel> channels)
         {
+            this.BUS = new Hardware.I2C(PCA9685.ADDRESS);
             this.Channels = channels;
             Init();
         }
@@ -41,7 +42,6 @@ namespace Tron.Device
 
         private void Init()
         {
-            this.BUS.SlaveAddress = ADDRESS;
             this.SetFreq(PWM_FREQUENCY);
             this.Reset();
             Hardware.Library.Delay(1000);
@@ -68,7 +68,6 @@ namespace Tron.Device
 
         private void Set(Channel channel, short on, short off)
         {
-            this.BUS.SlaveAddress = ADDRESS;
             var channel_base_reg = (byte)channel;
             
             this.BUS.WriteByte((byte)(channel_base_reg + 2), (byte)off);

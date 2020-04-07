@@ -1,4 +1,7 @@
-﻿using System;
+﻿// #define ENABLE_BUZZER
+// #define ENABLE_PCA9685
+
+using System;
 using System.Threading;
 
 namespace Quadcopter
@@ -15,22 +18,26 @@ namespace Quadcopter
 
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
             {
-                Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250(Tron.Hardware.I2C.Instance);
+                Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250();
 
+#if ENABLE_PCA9685
                 var channels = new Tron.Device.Channel[]
-                {
+                            {
                     Tron.Device.Channel.Channel0,
                     Tron.Device.Channel.Channel1,
                     Tron.Device.Channel.Channel2,
                     Tron.Device.Channel.Channel3,
-                };
-                Tron.Device.PCA9685 pca = new Tron.Device.PCA9685(Tron.Hardware.I2C.Instance, channels);
+                            };
+                Tron.Device.PCA9685 pca = new Tron.Device.PCA9685(channels);
                 pca.Enable = true;
+#endif
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.STANDBY;
                 Tron.Hardware.Library.Delay(1000);
 
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
 
+                mpu.Read();
+#if ENABLE_PCA9685
                 var start = DateTime.Now;
                 short target = 600;
                 for (short i = 0; i < target; i += 1)
@@ -53,8 +60,9 @@ namespace Quadcopter
                     // System.Console.WriteLine(i);
                     // Tron.Hardware.Library.Delay(20);
                 }
+#endif
+
             }
         }
     }
-
 }

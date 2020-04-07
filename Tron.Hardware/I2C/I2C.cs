@@ -9,7 +9,7 @@ namespace Tron.Hardware
     {
         #region Properties
 
-        byte SlaveAddress { get; set; }
+        byte SlaveAddress { get; }
         I2CClockDivider ClockDivider { get; set; }
         uint Baudrate { get; set; }
 
@@ -28,8 +28,6 @@ namespace Tron.Hardware
         I2CReasonCodes ReadRegister(byte[] regaddr, byte[] buf);
         I2CReasonCodes WriteReadRegister(byte[] cmds, byte[] buf);
         #endregion
-
-
     }
 
     public partial class I2C : II2C
@@ -42,20 +40,23 @@ namespace Tron.Hardware
         private byte[] _byte_buffer = new byte[2];
         #endregion
 
-        protected I2C()
+        public I2C(byte slaveAddress)
         {
-
+            this.Begin();
+            this.SlaveAddress = slaveAddress;
+            this.ClockDivider = Hardware.I2CClockDivider.CLOCK_DIVIDER_150;
         }
 
         #region Implement II2C
         public byte SlaveAddress
         {
             get => this._slaveAddress;
-            set
+            private set
             {
                 if (this._slaveAddress != value)
                 {
                     BCM2835_I2C.SetSlaveAddress(value);
+                    this._slaveAddress = value;
                 }
             }
         }
@@ -68,6 +69,7 @@ namespace Tron.Hardware
                 if (this._clockDivider != value)
                 {
                     BCM2835_I2C.SetClockDivider(value);
+                    this._clockDivider = value;
                 }
             }
         }
@@ -80,27 +82,11 @@ namespace Tron.Hardware
                 if (this._baudrate != value)
                 {
                     BCM2835_I2C.SetBaudrate(value);
+                    this._baudrate = value;
                 }
             }
         }
-
         #endregion
-
-
-        private static II2C _Instance = null;
-        public static II2C Instance
-        {
-            get
-            {
-                if (_Instance == null)
-                {
-                    _Instance = new I2C();
-                    _Instance.Begin();
-                    _Instance.ClockDivider = Hardware.I2CClockDivider.CLOCK_DIVIDER_150;
-                }
-                return _Instance;
-            }
-        }
     }
 
     partial class I2C
@@ -116,8 +102,11 @@ namespace Tron.Hardware
         }
 
 
+
         public byte ReadByte(byte address)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+
             this._addr_buffer[0] = address;
             if (BCM2835_I2C.ReadRegister(this._addr_buffer, this._byte_buffer, this._byte_buffer.Length) != I2CReasonCodes.REASON_OK)
             {
@@ -127,6 +116,8 @@ namespace Tron.Hardware
         }
         public I2CReasonCodes WriteByte(byte address, byte value)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+
             this._byte_buffer[0] = address;
             this._byte_buffer[1] = value;
             return BCM2835_I2C.Write(this._byte_buffer, this._byte_buffer.Length);
@@ -134,6 +125,8 @@ namespace Tron.Hardware
 
         public I2CReasonCodes Read(byte addr, byte[] buf)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            
             this._addr_buffer[0] = addr;
             if (BCM2835_I2C.Write(this._addr_buffer, this._addr_buffer.Length) != I2CReasonCodes.REASON_OK)
             {
@@ -143,15 +136,21 @@ namespace Tron.Hardware
         }
         public I2CReasonCodes Write(byte[] buf)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            
             return BCM2835_I2C.Write(buf, buf.Length);
         }
         public I2CReasonCodes ReadRegister(byte[] regaddr, byte[] buf)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            
             return BCM2835_I2C.ReadRegister(regaddr, buf, buf.Length);
         }
 
         public I2CReasonCodes WriteReadRegister(byte[] cmds, byte[] buf)
         {
+            BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
+            
             return BCM2835_I2C.WriteReadRegister(cmds, cmds.Length, buf, buf.Length);
         }
 
