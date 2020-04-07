@@ -22,12 +22,12 @@ namespace Quadcopter
 
 #if ENABLE_PCA9685
                 var channels = new Tron.Device.Channel[]
-                            {
+                {
                     Tron.Device.Channel.Channel0,
                     Tron.Device.Channel.Channel1,
                     Tron.Device.Channel.Channel2,
                     Tron.Device.Channel.Channel3,
-                            };
+                };
                 Tron.Device.PCA9685 pca = new Tron.Device.PCA9685(channels);
                 pca.Enable = true;
 #endif
@@ -39,7 +39,7 @@ namespace Quadcopter
                 while (true)
                 {
                     var start = DateTime.Now;
-                    short target = 0;
+                    short target = 20;
                     for (short i = 0; i < target; i += 1)
                     {
 #if ENABLE_PCA9685
@@ -50,7 +50,7 @@ namespace Quadcopter
 #endif
                         // System.Console.WriteLine(i);
                         mpu.Read();
-                        // Tron.Hardware.Library.Delay(5);
+                        Tron.Hardware.Library.Delay(1);
                     }
                     System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
                     for (short i = target; i >= 0; i -= 1)
@@ -62,7 +62,7 @@ namespace Quadcopter
                         }
 #endif
                         // System.Console.WriteLine(i);
-                        // Tron.Hardware.Library.Delay(20);
+                        Tron.Hardware.Library.Delay(20);
                     }
 #if ENABLE_PCA9685
 
