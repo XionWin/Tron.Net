@@ -40,7 +40,7 @@ namespace Quadcopter
                 while (true)
                 {
                     var start = DateTime.Now;
-                    short target = 20;
+                    short target = 50;
                     for (short i = 0; i < target; i += 1)
                     {
 #if ENABLE_PCA9685
