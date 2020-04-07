@@ -32,9 +32,7 @@ namespace Tron.Device.Indicator
             {
                 if (this._enable != value)
                 {
-#if ENABLE_BUZZER
                     Hardware.GPIO.CreatePin(BUZZER_PIN).State = value ? Hardware.PinState.Low : Hardware.PinState.High;
-#endif
                     this._enable = value;
                 }
             }

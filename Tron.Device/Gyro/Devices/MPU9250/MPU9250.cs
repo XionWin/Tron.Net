@@ -22,12 +22,20 @@ namespace Tron.Device.Gyro
                 var gy = (_buf[2] << 8) | _buf[3];
                 var gz = (_buf[4] << 8) | _buf[5];
             }
-            
+
             {
                 this.BUS.Read(0x43, _buf);
                 var cx = (_buf[0] << 8) | _buf[1];
                 var cy = (_buf[2] << 8) | _buf[3];
                 var cz = (_buf[4] << 8) | _buf[5];
+            }
+            var cm = 0;
+            for (int i = 0; i < 1000; i++)
+            {
+                var cx = (_buf[0] << 8) | _buf[1];
+                var cy = (_buf[2] << 8) | _buf[3];
+                var cz = (_buf[4] << 8) | _buf[5];
+                cm += cx + cy + cz;
             }
 
         }

@@ -44,7 +44,7 @@ namespace Tron.Hardware
         {
             this.Begin();
             this.SlaveAddress = slaveAddress;
-            this.ClockDivider = Hardware.I2CClockDivider.CLOCK_DIVIDER_150;
+            BCM2835_I2C.SetClockDivider(this._clockDivider);
         }
 
         #region Implement II2C
@@ -108,7 +108,7 @@ namespace Tron.Hardware
             BCM2835_I2C.SetSlaveAddress(this.SlaveAddress);
 
             this._addr_buffer[0] = address;
-            if (BCM2835_I2C.ReadRegister(this._addr_buffer, this._byte_buffer, this._byte_buffer.Length) != I2CReasonCodes.REASON_OK)
+            if (BCM2835_I2C.ReadRegister(this._addr_buffer, this._byte_buffer, 1) != I2CReasonCodes.REASON_OK)
             {
                 throw new Exception("I2C read byte error.");
             }

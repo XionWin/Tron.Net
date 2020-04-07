@@ -1,5 +1,5 @@
-﻿// #define ENABLE_BUZZER
-// #define ENABLE_PCA9685
+﻿#define ENABLE_BUZZER
+#define ENABLE_PCA9685
 
 using System;
 using System.Threading;
@@ -36,37 +36,39 @@ namespace Quadcopter
 
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
 
-
-                var start = DateTime.Now;
-                short target = 600;
-                for (short i = 0; i < target; i += 1)
+                while (true)
                 {
-#if ENABLE_PCA9685
-                    foreach (var channel in channels)
+                    var start = DateTime.Now;
+                    short target = 0;
+                    for (short i = 0; i < target; i += 1)
                     {
-                        pca.SetValue(channel, i);
-                    }
-#endif
-                    // System.Console.WriteLine(i);
-                    mpu.Read();
-                    // Tron.Hardware.Library.Delay(5);
-                }
-                System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
-                for (short i = target; i >= 0; i -= 1)
-                {
 #if ENABLE_PCA9685
-                    foreach (var channel in channels)
+                        foreach (var channel in channels)
+                        {
+                            pca.SetValue(channel, i);
+                        }
+#endif
+                        // System.Console.WriteLine(i);
+                        mpu.Read();
+                        // Tron.Hardware.Library.Delay(5);
+                    }
+                    System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                    for (short i = target; i >= 0; i -= 1)
                     {
-                        pca.SetValue(channel, i);
-                    }
-#endif
-                    // System.Console.WriteLine(i);
-                    // Tron.Hardware.Library.Delay(20);
-                }
 #if ENABLE_PCA9685
-                
+                        foreach (var channel in channels)
+                        {
+                            pca.SetValue(channel, i);
+                        }
+#endif
+                        // System.Console.WriteLine(i);
+                        // Tron.Hardware.Library.Delay(20);
+                    }
+#if ENABLE_PCA9685
+
 #endif
 
+                }
             }
         }
     }
