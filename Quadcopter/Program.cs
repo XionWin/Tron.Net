@@ -16,13 +16,6 @@ namespace Quadcopter
                 throw new Exception("Unable to initialize bcm2835.so library");
             MachineInfo.Show();
 
-
-            Tron.Hardware.Library.Delay(100);
-            Tron.Hardware.BCM2835_I2C.End();
-            Tron.Hardware.Library.Delay(1000);
-            Tron.Hardware.BCM2835_I2C.Begin();
-            Tron.Hardware.Library.Delay(100);
-
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
             {
                 Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250();
