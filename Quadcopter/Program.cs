@@ -36,16 +36,17 @@ namespace Quadcopter
 
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
 
-                mpu.Read();
-#if ENABLE_PCA9685
+
                 var start = DateTime.Now;
                 short target = 600;
                 for (short i = 0; i < target; i += 1)
                 {
+#if ENABLE_PCA9685
                     foreach (var channel in channels)
                     {
                         pca.SetValue(channel, i);
                     }
+#endif
                     // System.Console.WriteLine(i);
                     mpu.Read();
                     // Tron.Hardware.Library.Delay(5);
@@ -53,13 +54,17 @@ namespace Quadcopter
                 System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
                 for (short i = target; i >= 0; i -= 1)
                 {
+#if ENABLE_PCA9685
                     foreach (var channel in channels)
                     {
                         pca.SetValue(channel, i);
                     }
+#endif
                     // System.Console.WriteLine(i);
                     // Tron.Hardware.Library.Delay(20);
                 }
+#if ENABLE_PCA9685
+                
 #endif
 
             }
