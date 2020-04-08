@@ -13,7 +13,7 @@ namespace Quadcopter
             Tron.Linux.Realtime.SetRealtime();
             // initialize the mapped memory
             if (!Tron.Hardware.Library.Init())
-                throw new Exception("Unable to initialize bcm2835.so library");
+                throw new Exception("Unable to initialize bcm2835 library");
             MachineInfo.Show();
 
 #if ENABLE_BUZZER
