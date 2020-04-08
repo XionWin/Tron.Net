@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Tron.Device.Indicator
@@ -56,15 +58,24 @@ namespace Tron.Device.Indicator
         private const int _LONG_ON_DELAY = 250;
         private const int _LONG_OFF_DELAY = 100;
 
+        private Queue<IndicatorStatus> _status_queue = new Queue<IndicatorStatus>();
+
         private bool _switch = true;
-        public IntegratedIndicator()
+        public IntegratedIndicator(bool enableLED = true, bool enableBuzzer = true)
         {
+            this._led.Enable = enableLED;
+            this._buzzer.Enable = enableBuzzer;
             ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
             {
                 IndicatorStatus lastStatus = this.Status;
                 IndicatorTask lastTask = new IndicatorTask(null);
                 while (_switch)
                 {
+                    while(this._status_queue.Count > 1 && this._status_queue.Peek() == lastStatus)
+                    {
+                        this._status_queue.Dequeue();
+                    }
+
                     if (this.Status != lastStatus)
                     {
                         var task = CreateTaskFromStatus(this.Status);
@@ -85,12 +96,20 @@ namespace Tron.Device.Indicator
         }
 
         private LEDIndicator _led = LEDIndicator.Instance;
+
         private BuzzerIndicator _buzzer = BuzzerIndicator.Instance;
+
         public IndicatorStatus Status
         {
-            get;
-            set;
-        } = IndicatorStatus.NULL;
+            get => this._status_queue.Count > 0 ? this._status_queue.Peek(): IndicatorStatus.NULL;
+            set
+            {
+                if(this._status_queue.LastOrDefault() != value)
+                {
+                    this._status_queue.Enqueue(value);
+                }
+            }
+        }
 
         private IndicatorTask CreateTaskFromStatus(IndicatorStatus status)
         {
@@ -106,10 +125,10 @@ namespace Tron.Device.Indicator
                     {
                         this.Reset();
                         this._led.Color = IndicatorColor.BLUE;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_SHORT_OFF_DELAY);
                     });
                 case IndicatorStatus.STANDBY:
@@ -117,14 +136,14 @@ namespace Tron.Device.Indicator
                     {
                         this.Reset();
                         this._led.Color = IndicatorColor.WHITE;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_SHORT_OFF_DELAY);
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_SHORT_OFF_DELAY);
                     });
                 case IndicatorStatus.RUNING:
@@ -132,10 +151,10 @@ namespace Tron.Device.Indicator
                     {
                         this.Reset();
                         this._led.Color = IndicatorColor.GREEN;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_CIRCLE_TOTAL - _SHORT_ON_DELAY);
                     },
                     () =>
@@ -150,19 +169,19 @@ namespace Tron.Device.Indicator
                     {
                         this.Reset();
                         this._led.Color = IndicatorColor.YELLOW;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_CIRCLE_TOTAL - _SHORT_ON_DELAY);
                     },
                     () =>
                     {
                         this._led.Color = IndicatorColor.YELLOW;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_CIRCLE_TOTAL - _SHORT_ON_DELAY);
                     });
                 case IndicatorStatus.ERROR:
@@ -170,19 +189,19 @@ namespace Tron.Device.Indicator
                     {
                         this.Reset();
                         this._led.Color = IndicatorColor.RED;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_LONG_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_LONG_OFF_DELAY);
                     },
                     () =>
                     {
                         this._led.Color = IndicatorColor.RED;
-                        this._buzzer.Enable = true;
+                        this._buzzer.Value = true;
                         Hardware.Library.Delay(_LONG_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        this._buzzer.Enable = false;
+                        this._buzzer.Value = false;
                         Hardware.Library.Delay(_LONG_OFF_DELAY);
                     });
                 default:

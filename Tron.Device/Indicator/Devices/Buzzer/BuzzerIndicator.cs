@@ -24,7 +24,7 @@ namespace Tron.Device.Indicator
             }
         }
 
-        private bool _enable = false;
+        private bool _enable;
         public bool Enable
         {
             get => this._enable;
@@ -32,15 +32,32 @@ namespace Tron.Device.Indicator
             {
                 if (this._enable != value)
                 {
-                    Hardware.GPIO.CreatePin(BUZZER_PIN).State = value ? Hardware.PinState.Low : Hardware.PinState.High;
                     this._enable = value;
+                    if(!this._enable)
+                    {
+                        this.Reset();
+                    }
+                }
+            }
+        }
+
+        private bool _value = false;
+        public bool Value
+        {
+            get => this._value;
+            set
+            {
+                if (this.Enable && this._value != value)
+                {
+                    Hardware.GPIO.CreatePin(BUZZER_PIN).State = value ? Hardware.PinState.Low : Hardware.PinState.High;
+                    this._value = value;
                 }
             }
         }
 
         public void Reset()
         {
-            this.Enable = false;
+            this.Value = false;
             Hardware.GPIO.CreatePin(BUZZER_PIN).State = Hardware.PinState.High;
         }
     }

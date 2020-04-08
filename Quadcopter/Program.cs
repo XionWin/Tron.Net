@@ -1,5 +1,5 @@
-﻿#define ENABLE_BUZZER
-#define ENABLE_PCA9685
+﻿// #define ENABLE_BUZZER
+// #define ENABLE_PCA9685
 
 using System;
 using System.Threading;
@@ -16,7 +16,11 @@ namespace Quadcopter
                 throw new Exception("Unable to initialize bcm2835.so library");
             MachineInfo.Show();
 
+#if ENABLE_BUZZER
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
+#else
+            using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator(true, false))
+#endif
             {
                 Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250();
 
@@ -53,11 +57,21 @@ namespace Quadcopter
                         mpu.Read();
                         // Tron.Hardware.Library.Delay(1);
                     }
-                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    var counter = target / (DateTime.Now - start).TotalSeconds;
+                    if (counter < 7000)
                     {
-                        System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
-                        lastUpdate = DateTime.Now;
+                        System.Console.WriteLine(counter);
+                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
+                    else
+                    {
+                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
+                    }
+                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    // {
+                    //     System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                    //     lastUpdate = DateTime.Now;
+                    // }
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_PCA9685
