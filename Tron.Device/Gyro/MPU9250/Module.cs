@@ -10,6 +10,13 @@ namespace Tron.Device.Gyro.MPU9250
             this.BUS = new Hardware.I2C(Module.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
         }
         byte[] _buf = new byte[6];
+
+        public Mode Mode
+        {
+            get;
+            set;
+        }
+
         public void Read()
         {
             this.BUS.Read(0x3B, _buf);
@@ -40,7 +47,5 @@ namespace Tron.Device.Gyro.MPU9250
 
         }
 
-        public event OnEularAnglesChangedHanlder OnEularAnglesChanged;
-        public event OnQuaternionChangedHanlder OnQuaternionChanged;
     }
 }
