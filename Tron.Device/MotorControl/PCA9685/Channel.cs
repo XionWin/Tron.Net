@@ -1,4 +1,4 @@
-namespace Tron.Device
+namespace Tron.Device.MotorControl.PCA9685
 {
     public enum Channel: byte
     {

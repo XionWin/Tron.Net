@@ -1,13 +1,13 @@
 using System;
 
-namespace Tron.Device.Gyro
+namespace Tron.Device.Gyro.MPU9250
 {
-    public class MPU9250 : BusDevice<Hardware.II2C>, IGyro
+    public class Module : BusDevice<Hardware.II2C>, IGyro
     {
         private const byte ADDRESS = 0x68;
-        public MPU9250()
+        public Module()
         {
-            this.BUS = new Hardware.I2C(MPU9250.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
+            this.BUS = new Hardware.I2C(Module.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
         }
         byte[] _buf = new byte[6];
         public void Read()

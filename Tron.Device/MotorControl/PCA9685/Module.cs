@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tron.Device
+namespace Tron.Device.MotorControl.PCA9685
 {
-    public class PCA9685 : BusDevice<Hardware.II2C>
+    public class Module : BusDevice<Hardware.II2C>
     {
         private const Hardware.GPIOPins PIN_EN = Hardware.GPIOPins.GPIO_04;
         private const byte ADDRESS = 0x40;
@@ -20,9 +20,9 @@ namespace Tron.Device
 
 
         private byte _sleep_data = 0x00;
-        public PCA9685(IEnumerable<Channel> channels)
+        public Module(IEnumerable<Channel> channels)
         {
-            this.BUS = new Hardware.I2C(PCA9685.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_250);
+            this.BUS = new Hardware.I2C(Module.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_250);
             this.Channels = channels;
             Init();
         }

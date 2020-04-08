@@ -1,5 +1,5 @@
 ﻿// #define ENABLE_BUZZER
-// #define ENABLE_PCA9685
+// #define ENABLE_MOTOR
 
 using System;
 using System.Threading;
@@ -22,9 +22,9 @@ namespace Quadcopter
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator(true, false))
 #endif
             {
-                Tron.Device.Gyro.MPU9250 mpu = new Tron.Device.Gyro.MPU9250();
+                var gyro = new Tron.Device.Gyro.MPU9250.Module();
 
-#if ENABLE_PCA9685
+#if ENABLE_MOTOR
                 var channels = new Tron.Device.Channel[]
                 {
                     Tron.Device.Channel.Channel0,
@@ -32,7 +32,7 @@ namespace Quadcopter
                     Tron.Device.Channel.Channel2,
                     Tron.Device.Channel.Channel3,
                 };
-                Tron.Device.PCA9685 pca = new Tron.Device.PCA9685(channels);
+                var pca = new Tron.Device.MotorControl.PCA9685.Module(channels);
                 pca.Enable = true;
 #endif
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.STANDBY;
@@ -47,14 +47,14 @@ namespace Quadcopter
                     short target = 50;
                     for (short i = 0; i < target; i += 1)
                     {
-#if ENABLE_PCA9685
+#if ENABLE_MOTOR
                         foreach (var channel in channels)
                         {
                             pca.SetValue(channel, i);
                         }
 #endif
                         // System.Console.WriteLine(i);
-                        mpu.Read();
+                        gyro.Read();
                         // Tron.Hardware.Library.Delay(1);
                     }
                     var counter = target / (DateTime.Now - start).TotalSeconds;
@@ -74,7 +74,7 @@ namespace Quadcopter
                     // }
                     for (short i = target; i >= 0; i -= 1)
                     {
-#if ENABLE_PCA9685
+#if ENABLE_MOTOR
                         foreach (var channel in channels)
                         {
                             pca.SetValue(channel, i);
@@ -83,7 +83,7 @@ namespace Quadcopter
                         // System.Console.WriteLine(i);
                         // Tron.Hardware.Library.Delay(20);
                     }
-#if ENABLE_PCA9685
+#if ENABLE_MOTOR
 
 #endif
 
