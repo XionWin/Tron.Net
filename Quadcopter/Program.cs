@@ -1,5 +1,5 @@
-﻿// #define ENABLE_BUZZER
-// #define ENABLE_MOTOR
+﻿#define ENABLE_BUZZER
+#define ENABLE_MOTOR
 
 using System;
 using System.Threading;
@@ -25,12 +25,12 @@ namespace Quadcopter
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
 
 #if ENABLE_MOTOR
-                var channels = new Tron.Device.Channel[]
+                var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
                 {
-                    Tron.Device.Channel.Channel0,
-                    Tron.Device.Channel.Channel1,
-                    Tron.Device.Channel.Channel2,
-                    Tron.Device.Channel.Channel3,
+                    Tron.Device.MotorControl.PCA9685.Channel.Channel0,
+                    Tron.Device.MotorControl.PCA9685.Channel.Channel1,
+                    Tron.Device.MotorControl.PCA9685.Channel.Channel2,
+                    Tron.Device.MotorControl.PCA9685.Channel.Channel3,
                 };
                 var pca = new Tron.Device.MotorControl.PCA9685.Module(channels);
                 pca.Enable = true;
@@ -44,7 +44,7 @@ namespace Quadcopter
                 while (true)
                 {
                     var start = DateTime.Now;
-                    short target = 50;
+                    short target = 5;
                     for (short i = 0; i < target; i += 1)
                     {
 #if ENABLE_MOTOR
@@ -58,7 +58,7 @@ namespace Quadcopter
                         // Tron.Hardware.Library.Delay(1);
                     }
                     var counter = target / (DateTime.Now - start).TotalSeconds;
-                    if (counter < 7000)
+                    if (counter < 3000)
                     {
                         System.Console.WriteLine(counter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
@@ -67,11 +67,11 @@ namespace Quadcopter
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
-                    // {
-                    //     System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
-                    //     lastUpdate = DateTime.Now;
-                    // }
+                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    {
+                        System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                        lastUpdate = DateTime.Now;
+                    }
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR
