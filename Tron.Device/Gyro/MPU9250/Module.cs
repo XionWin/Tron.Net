@@ -4,17 +4,26 @@ namespace Tron.Device.Gyro.MPU9250
 {
     public class Module : BusDevice<Hardware.II2C>, IGyro
     {
-        private const byte ADDRESS = 0x68;
         public Module()
         {
-            this.BUS = new Hardware.I2C(Module.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
+            this.BUS = new Hardware.I2C((byte)Register.MODULE_ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150);
+            if(!this.Initialize())
+            {
+                throw new Exception("MPU9250 module initialize error");
+            }
         }
+
         byte[] _buf = new byte[6];
 
         public Mode Mode
         {
             get;
             set;
+        }
+
+        private bool Initialize()
+        {
+            return this.BUS.ReadByte((byte)Register.WHO_AM_I) == 0x71;
         }
 
         public void Read()

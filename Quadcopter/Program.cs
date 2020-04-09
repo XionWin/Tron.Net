@@ -17,9 +17,9 @@ namespace Quadcopter
             MachineInfo.Show();
 
 #if ENABLE_BUZZER
-            using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
+            using (var indicator = new Tron.Device.Indicator.Module())
 #else
-            using (Tron.Device.Indicator.Module indicator = new Tron.Device.Indicator.Module(true, false))
+            using (var indicator = new Tron.Device.Indicator.Module(true, false))
 #endif
             {
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
