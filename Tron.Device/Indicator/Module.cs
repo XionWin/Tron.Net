@@ -49,7 +49,7 @@ namespace Tron.Device.Indicator
         }
     }
 
-    public class IntegratedIndicator : IDisposable
+    public class Module : IDisposable
     {
         private const int _CIRCLE_TOTAL = 1000;
         private const int _SHORT_ON_DELAY = 50;
@@ -61,7 +61,7 @@ namespace Tron.Device.Indicator
         private Queue<IndicatorStatus> _status_queue = new Queue<IndicatorStatus>();
 
         private bool _switch = true;
-        public IntegratedIndicator(bool enableLED = true, bool enableBuzzer = true)
+        public Module(bool enableLED = true, bool enableBuzzer = true)
         {
             this._led.Enable = enableLED;
             this._buzzer.Enable = enableBuzzer;

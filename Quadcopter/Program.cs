@@ -1,5 +1,5 @@
-﻿#define ENABLE_BUZZER
-#define ENABLE_MOTOR
+﻿// #define ENABLE_BUZZER
+// #define ENABLE_MOTOR
 
 using System;
 using System.Threading;
@@ -19,7 +19,7 @@ namespace Quadcopter
 #if ENABLE_BUZZER
             using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator())
 #else
-            using (Tron.Device.Indicator.IntegratedIndicator indicator = new Tron.Device.Indicator.IntegratedIndicator(true, false))
+            using (Tron.Device.Indicator.Module indicator = new Tron.Device.Indicator.Module(true, false))
 #endif
             {
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
@@ -58,20 +58,20 @@ namespace Quadcopter
                         // Tron.Hardware.Library.Delay(1);
                     }
                     var counter = target / (DateTime.Now - start).TotalSeconds;
-                    if (counter < 3000)
+                    if (counter < 7000)
                     {
-                        System.Console.WriteLine(counter);
+                        System.Console.WriteLine("Warning: {0}", counter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
                     else
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
-                    {
-                        System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
-                        lastUpdate = DateTime.Now;
-                    }
+                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    // {
+                    //     System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
+                    //     lastUpdate = DateTime.Now;
+                    // }
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR
