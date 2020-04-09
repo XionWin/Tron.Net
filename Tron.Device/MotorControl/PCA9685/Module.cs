@@ -10,8 +10,8 @@ namespace Tron.Device.MotorControl.PCA9685
 
         private const int PWM_SCALE = 4095;
         private const int PWM_FREQUENCY = 400;
-        private const short PWM_LOW_STATIC = 960 * 2;
-        private const short PWM_LOW_DYNAMIC = 970 * 2;   //1938 base on 400 frequency
+        private const short PWM_STATIC_LOW = 960 * 2;
+        private const short PWM_DYNAMIC_LOW = 970 * 2;   //1938 base on 400 frequency
         private const short PWM_HIGH = 1965 * 2;     //3930 base on 400 frequency
 
 
@@ -56,8 +56,8 @@ namespace Tron.Device.MotorControl.PCA9685
         {
             if (value <= 1000)
             {
-                var v = value == 0 ? PWM_LOW_STATIC :
-                (short)(PWM_LOW_DYNAMIC + ((PWM_HIGH - PWM_LOW_DYNAMIC) / 1000 * (value - 1)));
+                var v = value == 0 ? PWM_STATIC_LOW :
+                (short)(PWM_DYNAMIC_LOW + ((PWM_HIGH - PWM_DYNAMIC_LOW) / 1000 * (value - 1)));
                 this.Set(channel, 0, v);
             }
         }
@@ -73,7 +73,7 @@ namespace Tron.Device.MotorControl.PCA9685
         {
             foreach (var channel in this.Channels)
             {
-                this.Set(channel, 0, PWM_LOW_STATIC);
+                this.Set(channel, 0, PWM_STATIC_LOW);
             }
         }
         private void Sleep()

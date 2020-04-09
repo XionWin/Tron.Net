@@ -2,23 +2,24 @@ namespace Tron.Device.MotorControl.PCA9685
 {
     public enum Channel: byte
     {
-        Channel0 = 0x06,
-        Channel1 = 0x0A,
-        Channel2 = 0x0E,
-        Channel3 = 0x12,
-        Channel4 = 0x16,
-        Channel5 = 0x1A,
-        Channel6 = 0x1E,
-        Channel7 = 0x22,
-        Channel8 = 0x26,
-        Channel9 = 0x2A,
-        ChannelA = 0x2E,
-        ChannelB = 0x32,
-        ChannelC = 0x36,
-        ChannelD = 0x3A,
-        ChannelE = 0x3E,
-        ChannelF = 0x42,
         // Don't use this register, it will make some delay.
         // ChannelALL = 0xFA
+
+        Channel0 = Register.Channel0,
+        Channel1 = Register.Channel1,
+        Channel2 = Register.Channel2,
+        Channel3 = Register.Channel3,
+        Channel4 = Register.Channel4,
+        Channel5 = Register.Channel5,
+        Channel6 = Register.Channel6,
+        Channel7 = Register.Channel7,
+        Channel8 = Register.Channel8,
+        Channel9 = Register.Channel9,
+        ChannelA = Register.ChannelA,
+        ChannelB = Register.ChannelB,
+        ChannelC = Register.ChannelC,
+        ChannelD = Register.ChannelD,
+        ChannelE = Register.ChannelE,
+        ChannelF = Register.ChannelF,
     }
 }
