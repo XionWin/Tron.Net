@@ -18,7 +18,6 @@ namespace Tron.Device.MotorControl.PCA9685
         ChannelD = 0x3A,
         ChannelE = 0x3E,
         ChannelF = 0x42,
-
         // Don't use this register, it will make some delay.
         // ChannelALL = 0xFA
     }

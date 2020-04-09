@@ -3,13 +3,9 @@ using System.Collections.Generic;
 
 namespace Tron.Device.MotorControl.PCA9685
 {
-    public class Module : BusDevice<Hardware.II2C>
+    public class Module : Hardware.I2CDevice<Register>
     {
         private const Hardware.GPIOPins PIN_EN = Hardware.GPIOPins.GPIO_04;
-        private const byte ADDRESS = 0x40;
-        private const byte MODE1 = 0x00;
-        private const byte MODE2 = 0x01;
-        private const int PRE_SCALE = 0xFE;
         private const int CLOCK_FREQ = 25000000;     //25MHz default osc clock
 
         private const int PWM_SCALE = 4095;
@@ -21,8 +17,8 @@ namespace Tron.Device.MotorControl.PCA9685
 
         private byte _sleep_data = 0x00;
         public Module(IEnumerable<Channel> channels)
+            : base(new Hardware.I2C((byte)Register.MODULE_ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_200))
         {
-            this.BUS = new Hardware.I2C(Module.ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_250);
             this.Channels = channels;
             Init();
         }
@@ -52,7 +48,7 @@ namespace Tron.Device.MotorControl.PCA9685
             byte prescale = (byte)((CLOCK_FREQ / PWM_SCALE / freq) - 1);
 
             this.Sleep();
-            this.BUS.WriteByte(PRE_SCALE, prescale);
+            this.WriteByte(Register.PRE_SCALE, prescale);
             this.Wake();
         }
 
@@ -69,9 +65,9 @@ namespace Tron.Device.MotorControl.PCA9685
         private void Set(Channel channel, short on, short off)
         {
             var channel_base_reg = (byte)channel;
-            
-            this.BUS.WriteByte((byte)(channel_base_reg + 2), (byte)off);
-            this.BUS.WriteByte((byte)(channel_base_reg + 3), (byte)(off >> 8));
+
+            this.WriteByte((byte)(channel_base_reg + 2), (byte)off);
+            this.WriteByte((byte)(channel_base_reg + 3), (byte)(off >> 8));
         }
         private void Reset()
         {
@@ -83,17 +79,17 @@ namespace Tron.Device.MotorControl.PCA9685
         private void Sleep()
         {
             this.Reset();
-            this._sleep_data = this.BUS.ReadByte(MODE1);
+            this._sleep_data = this.ReadByte(Register.MODE1);
             var new_mode = (byte)((this._sleep_data & 0x7F) | 0x10); // sleep
-            this.BUS.WriteByte(MODE1, new_mode);
+            this.WriteByte(Register.MODE1, new_mode);
         }
 
         public void Wake()
         {
             var old_mode = this._sleep_data;
-            this.BUS.WriteByte(MODE1, old_mode);
+            this.WriteByte(Register.MODE1, old_mode);
             Hardware.Library.DelayMicroseconds(500);
-            this.BUS.WriteByte(MODE1, (byte)(old_mode & 0x6F));
+            this.WriteByte(Register.MODE1, (byte)(old_mode & 0x6F));
             this.Reset();
             Hardware.Library.DelayMicroseconds(500);
         }

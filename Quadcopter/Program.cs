@@ -1,5 +1,5 @@
-﻿// #define ENABLE_BUZZER
-// #define ENABLE_MOTOR
+﻿#define ENABLE_BUZZER
+#define ENABLE_MOTOR
 
 using System;
 using System.Threading;
@@ -41,10 +41,11 @@ namespace Quadcopter
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
 
                 DateTime lastUpdate = DateTime.Now;
+                double minCounter = double.MaxValue;
                 while (true)
                 {
                     var start = DateTime.Now;
-                    short target = 5;
+                    short target = 50;
                     for (short i = 0; i < target; i += 1)
                     {
 #if ENABLE_MOTOR
@@ -53,25 +54,23 @@ namespace Quadcopter
                             pca.SetValue(channel, i);
                         }
 #endif
-                        // System.Console.WriteLine(i);
                         gyro.Read();
-                        // Tron.Hardware.Library.Delay(1);
                     }
-                    var counter = target / (DateTime.Now - start).TotalSeconds;
-                    if (counter < 7000)
+                    minCounter = Math.Min(target / (DateTime.Now - start).TotalSeconds, minCounter);
+                    if (minCounter < 4000)
                     {
-                        System.Console.WriteLine("Warning: {0}", counter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
                     else
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
-                    // {
-                    //     System.Console.WriteLine("{0}", target / (DateTime.Now - start).TotalSeconds);
-                    //     lastUpdate = DateTime.Now;
-                    // }
+                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    {
+                        System.Console.WriteLine("{0}", minCounter);
+                        lastUpdate = DateTime.Now;
+                        minCounter = double.MaxValue;
+                    }
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR
@@ -80,8 +79,6 @@ namespace Quadcopter
                             pca.SetValue(channel, i);
                         }
 #endif
-                        // System.Console.WriteLine(i);
-                        // Tron.Hardware.Library.Delay(20);
                     }
 #if ENABLE_MOTOR
 
