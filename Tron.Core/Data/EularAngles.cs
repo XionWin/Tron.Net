@@ -1,6 +1,6 @@
 using System;
 
-namespace Tron.Device.Gyro
+namespace Tron.Core.Data
 {
     public struct EularAngles
     {

@@ -1,5 +1,6 @@
-﻿#define ENABLE_BUZZER
-#define ENABLE_MOTOR
+﻿// #define ENABLE_LED
+#define ENABLE_BUZZER
+// #define ENABLE_MOTOR
 
 using System;
 using System.Threading;
@@ -16,25 +17,28 @@ namespace Quadcopter
                 throw new Exception("Unable to initialize bcm2835 library");
             MachineInfo.Show();
 
-#if ENABLE_BUZZER
             using (var indicator = new Tron.Device.Indicator.Module())
-#else
-            using (var indicator = new Tron.Device.Indicator.Module(true, false))
-#endif
             {
+#if !ENABLE_LED
+                indicator.LEDSwitch = false;
+#endif
+#if !ENABLE_BUZZER
+                indicator.BuzzerSwitch = false;
+#endif
+
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
 
                 System.Console.WriteLine("Calibrate gyro module...");
                 var c = gyro.Calibrate();
                 System.Console.WriteLine
                 (
-                    "gx: {0} gy: {1} gz: {2}\nax: {3} ay: {4} az: {5}",
-                    c.gx,
-                    c.gy,
-                    c.gz,
+                    "ax: {0} ay: {1} az: {2}\ngx: {3} gy: {4} gz: {5}",
                     c.ax,
                     c.ay,
-                    c.az
+                    c.az,
+                    c.gx,
+                    c.gy,
+                    c.gz
                 );
 
 #if ENABLE_MOTOR
@@ -57,6 +61,9 @@ namespace Quadcopter
 
                 DateTime lastUpdate = DateTime.Now;
                 double minCounter = double.MaxValue;
+
+                Tron.Core.Data.Vector3 acc = new Tron.Core.Data.Vector3();
+                Tron.Core.Data.Vector3 g = new Tron.Core.Data.Vector3();
                 while (true)
                 {
                     var start = DateTime.Now;
@@ -69,7 +76,8 @@ namespace Quadcopter
                             motor.SetValue(channel, i);
                         }
 #endif
-                        gyro.Read();
+                        acc = gyro.Accel;
+                        g = gyro.Gyro;
                         Tron.Linux.System.Sleep(50);
                     }
 
@@ -84,11 +92,25 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
                     {
+                        System.Console.WriteLine
+                        (
+                            "ax: {0} ay: {1} az: {2}",
+                            acc.X,
+                            acc.Y,
+                            acc.Z
+                        );
+                        System.Console.WriteLine
+                        (
+                            "gx: {0} gy: {1} gz: {2}",
+                            g.X,
+                            g.Y,
+                            g.Z
+                        );
                         System.Console.WriteLine("Frequency: {0:.}", minCounter);
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
                     }
-                    
+
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR

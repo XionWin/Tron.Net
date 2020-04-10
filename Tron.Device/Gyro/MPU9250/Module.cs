@@ -96,7 +96,7 @@ namespace Tron.Device.Gyro.MPU9250
 
         // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
         // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-        public (float gx, float gy, float gz, float ax, float ay, float az) Calibrate()
+        public (float ax, float ay, float az, float gx, float gy, float gz) Calibrate()
         {
             float[] dest1 = new float[3];
             float[] dest2 = new float[3];
@@ -184,27 +184,6 @@ namespace Tron.Device.Gyro.MPU9250
                 accel_bias[2] += accelsensitivity;
             }
 
-            // Construct the gyro biases for push to the hardware gyro bias registers, which are reset to zero upon device startup
-            data_12[0] = (byte)((-gyro_bias[0] / 4 >> 8) & 0xFF);		// Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input format
-            data_12[1] = (byte)((-gyro_bias[0] / 4) & 0xFF);		// Biases are additive, so change sign on calculated average gyro biases
-            data_12[2] = (byte)((-gyro_bias[1] / 4 >> 8) & 0xFF);
-            data_12[3] = (byte)((-gyro_bias[1] / 4) & 0xFF);
-            data_12[4] = (byte)((-gyro_bias[2] / 4 >> 8) & 0xFF);
-            data_12[5] = (byte)((-gyro_bias[2] / 4) & 0xFF);
-
-            // Push gyro biases to hardware registers
-            this.WriteByte(Register.XG_OFFSET_H, data_12[0]);
-            this.WriteByte(Register.XG_OFFSET_L, data_12[1]);
-            this.WriteByte(Register.YG_OFFSET_H, data_12[2]);
-            this.WriteByte(Register.YG_OFFSET_L, data_12[3]);
-            this.WriteByte(Register.ZG_OFFSET_H, data_12[4]);
-            this.WriteByte(Register.ZG_OFFSET_L, data_12[5]);
-
-            // Output scaled gyro biases for display in the main program
-            dest1[0] = (float)gyro_bias[0] / (float)gyrosensitivity;
-            dest1[1] = (float)gyro_bias[1] / (float)gyrosensitivity;
-            dest1[2] = (float)gyro_bias[2] / (float)gyrosensitivity;
-
             // Construct the accelerometer biases for push to the hardware accelerometer bias registers. These registers contain
             // factory trim values which must be added to the calculated accelerometer biases; on boot up these registers will hold
             // non-zero values. In addition, bit 0 of the lower byte must be preserved since it is used for temperature
@@ -256,45 +235,66 @@ namespace Tron.Device.Gyro.MPU9250
             // writeByte(MPU9250_ADDRESS, ZA_OFFSET_L, data[5]);
 
             // Output scaled accelerometer biases for display in the main program
-            dest2[0] = (float)accel_bias[0] / (float)accelsensitivity;
-            dest2[1] = (float)accel_bias[1] / (float)accelsensitivity;
-            dest2[2] = (float)accel_bias[2] / (float)accelsensitivity;
+            dest1[0] = (float)accel_bias[0] / (float)accelsensitivity;
+            dest1[1] = (float)accel_bias[1] / (float)accelsensitivity;
+            dest1[2] = (float)accel_bias[2] / (float)accelsensitivity;
+
+            
+
+            // Construct the gyro biases for push to the hardware gyro bias registers, which are reset to zero upon device startup
+            data_12[0] = (byte)((-gyro_bias[0] / 4 >> 8) & 0xFF);		// Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input format
+            data_12[1] = (byte)((-gyro_bias[0] / 4) & 0xFF);		// Biases are additive, so change sign on calculated average gyro biases
+            data_12[2] = (byte)((-gyro_bias[1] / 4 >> 8) & 0xFF);
+            data_12[3] = (byte)((-gyro_bias[1] / 4) & 0xFF);
+            data_12[4] = (byte)((-gyro_bias[2] / 4 >> 8) & 0xFF);
+            data_12[5] = (byte)((-gyro_bias[2] / 4) & 0xFF);
+
+            // Push gyro biases to hardware registers
+            this.WriteByte(Register.XG_OFFSET_H, data_12[0]);
+            this.WriteByte(Register.XG_OFFSET_L, data_12[1]);
+            this.WriteByte(Register.YG_OFFSET_H, data_12[2]);
+            this.WriteByte(Register.YG_OFFSET_L, data_12[3]);
+            this.WriteByte(Register.ZG_OFFSET_H, data_12[4]);
+            this.WriteByte(Register.ZG_OFFSET_L, data_12[5]);
+
+            // Output scaled gyro biases for display in the main program
+            dest2[0] = (float)gyro_bias[0] / (float)gyrosensitivity;
+            dest2[1] = (float)gyro_bias[1] / (float)gyrosensitivity;
+            dest2[2] = (float)gyro_bias[2] / (float)gyrosensitivity;
 
             Hardware.Library.Delay(100);
             this.Initiailze(Ascale.AFS_2G, Gscale.GFS_1000DPS, 0x04);
             return (dest1[0], dest1[1], dest1[2], dest2[0], dest2[1], dest2[2]);
         }
 
-
-        byte[] _buf = new byte[6];
-        public void Read()
+        byte[] _accel_buf = new byte[6];
+        public Core.Data.Vector3 Accel
         {
-            this.Read(Register.ACCEL_ADDRESS, _buf);
-            var ax = (_buf[0] << 8) | _buf[1];
-            var ay = (_buf[2] << 8) | _buf[3];
-            var az = (_buf[4] << 8) | _buf[5];
-            {
-                this.Read(Register.GYRO_ADDRESS, _buf);
-                var gx = (_buf[0] << 8) | _buf[1];
-                var gy = (_buf[2] << 8) | _buf[3];
-                var gz = (_buf[4] << 8) | _buf[5];
-            }
+            get => this.ReadAccelData();
+        }
+        private Core.Data.Vector3 ReadAccelData()
+        {
+            this.Read(Register.ACCEL_XOUT_H, _accel_buf);
+            return new Core.Data.Vector3(
+                (_accel_buf[0] << 8) | _accel_buf[1],
+                (_accel_buf[2] << 8) | _accel_buf[3],
+                (_accel_buf[4] << 8) | _accel_buf[5]
+            );
+        }
 
-            {
-                this.Read(Register.GYRO_ADDRESS, _buf);
-                var cx = (_buf[0] << 8) | _buf[1];
-                var cy = (_buf[2] << 8) | _buf[3];
-                var cz = (_buf[4] << 8) | _buf[5];
-            }
-            var cm = 0;
-            for (int i = 0; i < 1000; i++)
-            {
-                var cx = (_buf[0] << 8) | _buf[1];
-                var cy = (_buf[2] << 8) | _buf[3];
-                var cz = (_buf[4] << 8) | _buf[5];
-                cm += cx + cy + cz;
-            }
-
+        byte[] _gyro_buf = new byte[6];
+        public Core.Data.Vector3 Gyro
+        {
+            get => this.ReadGyroData();
+        }
+        private Core.Data.Vector3 ReadGyroData()
+        {
+            this.Read(Register.GYRO_XOUT_H, _gyro_buf);
+            return new Core.Data.Vector3(
+                (_gyro_buf[0] << 8) | _gyro_buf[1],
+                (_gyro_buf[2] << 8) | _gyro_buf[3],
+                (_gyro_buf[4] << 8) | _gyro_buf[5]
+            );
         }
 
     }

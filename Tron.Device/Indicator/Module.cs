@@ -37,7 +37,7 @@ namespace Tron.Device.Indicator
 
         public void Run()
         {
-            if(this._flag)
+            if (this._flag)
             {
                 this.Action?.Invoke();
                 this._flag = false;
@@ -63,15 +63,15 @@ namespace Tron.Device.Indicator
         private bool _switch = true;
         public Module(bool enableLED = true, bool enableBuzzer = true)
         {
-            this._led.Enable = enableLED;
-            this._buzzer.Enable = enableBuzzer;
+            this.LEDSwitch = enableLED;
+            this.BuzzerSwitch = enableBuzzer;
             ThreadPool.QueueUserWorkItem(new WaitCallback((o) =>
             {
                 IndicatorStatus lastStatus = this.Status;
                 IndicatorTask lastTask = new IndicatorTask(null);
                 while (_switch)
                 {
-                    while(this._status_queue.Count > 1 && this._status_queue.Peek() == lastStatus)
+                    while (this._status_queue.Count > 1 && this._status_queue.Peek() == lastStatus)
                     {
                         this._status_queue.Dequeue();
                     }
@@ -83,7 +83,7 @@ namespace Tron.Device.Indicator
                         lastStatus = this.Status;
                         lastTask = task;
                     }
-                    else if(lastTask.CircleAction != null)
+                    else if (lastTask.CircleAction != null)
                     {
                         lastTask.Run();
                     }
@@ -95,16 +95,27 @@ namespace Tron.Device.Indicator
             }));
         }
 
+        public bool LEDSwitch
+        {
+            get => this._led.Enable;
+            set => this._led.Enable = value;
+        }
+        public bool BuzzerSwitch
+        {
+            get => this._buzzer.Enable;
+            set => this._buzzer.Enable = value;
+        }
+
         private LEDIndicator _led = LEDIndicator.Instance;
 
         private BuzzerIndicator _buzzer = BuzzerIndicator.Instance;
 
         public IndicatorStatus Status
         {
-            get => this._status_queue.Count > 0 ? this._status_queue.Peek(): IndicatorStatus.NULL;
+            get => this._status_queue.Count > 0 ? this._status_queue.Peek() : IndicatorStatus.NULL;
             set
             {
-                if(this._status_queue.LastOrDefault() != value)
+                if (this._status_queue.LastOrDefault() != value)
                 {
                     this._status_queue.Enqueue(value);
                 }
@@ -162,7 +173,7 @@ namespace Tron.Device.Indicator
                         this._led.Color = IndicatorColor.GREEN;
                         Hardware.Library.Delay(_SHORT_ON_DELAY);
                         this._led.Color = IndicatorColor.NULL;
-                        Hardware.Library.Delay(_CIRCLE_TOTAL - _SHORT_ON_DELAY); 
+                        Hardware.Library.Delay(_CIRCLE_TOTAL - _SHORT_ON_DELAY);
                     });
                 case IndicatorStatus.WRINING:
                     return new IndicatorTask(() =>
@@ -208,7 +219,7 @@ namespace Tron.Device.Indicator
                     return new IndicatorTask(null);
             }
         }
-        
+
         private void Reset()
         {
             this._led.Reset();
