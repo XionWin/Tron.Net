@@ -1,5 +1,5 @@
-﻿#define ENABLE_BUZZER
-#define ENABLE_MOTOR
+﻿// #define ENABLE_BUZZER
+// #define ENABLE_MOTOR
 
 using System;
 using System.Threading;
