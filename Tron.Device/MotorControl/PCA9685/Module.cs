@@ -22,6 +22,11 @@ namespace Tron.Device.MotorControl.PCA9685
             this.Channels = channels;
             Init();
         }
+        public override byte ID
+        {
+            get => 0x00;
+        }
+
         public IEnumerable<Channel> Channels
         {
             get;

@@ -1,4 +1,4 @@
-﻿// #define ENABLE_BUZZER
+﻿#define ENABLE_BUZZER
 // #define ENABLE_MOTOR
 
 using System;
@@ -23,6 +23,19 @@ namespace Quadcopter
 #endif
             {
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
+                
+                System.Console.WriteLine("Calibrate gyro module...");
+                var c = gyro.Calibrate();
+                System.Console.WriteLine
+                (
+                    "gx: {0} gy: {1} gz: {2}\nax: {3} ay: {4} az: {5}",
+                    c.gx,
+                    c.gy,
+                    c.gz,
+                    c.ax,
+                    c.ay,
+                    c.az
+                );
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
@@ -35,6 +48,8 @@ namespace Quadcopter
                 var pca = new Tron.Device.MotorControl.PCA9685.Module(channels);
                 pca.Enable = true;
 #endif
+
+
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.STANDBY;
                 Tron.Hardware.Library.Delay(1000);
 
@@ -59,20 +74,20 @@ namespace Quadcopter
                     minCounter = Math.Min(target / (DateTime.Now - start).TotalSeconds, minCounter);
                     if (minCounter < 7000)
                     {
-                        System.Console.WriteLine("{0}: {1}",DateTime.Now.ToString(), minCounter);
+                        // System.Console.WriteLine("{0}: {1}",DateTime.Now.ToString(), minCounter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
                     else
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
-                    // {
-                    //     System.Console.WriteLine("{0}", minCounter);
-                    //     lastUpdate = DateTime.Now;
-                    //     minCounter = double.MaxValue;
-                    // }
-                    minCounter = double.MaxValue;
+                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    {
+                        System.Console.WriteLine("{0}", minCounter);
+                        lastUpdate = DateTime.Now;
+                        minCounter = double.MaxValue;
+                    }
+                    // minCounter = double.MaxValue;
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR

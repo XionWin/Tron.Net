@@ -23,7 +23,7 @@
             "type": "shell",
             "args": [
                 "${workspaceFolder}/Quadcopter/bin/Debug/netcoreapp3.1/*",
-                "pi@192.168.137.31:/home/pi/share/bin"
+                "pi@192.168.0.22:/home/pi/share/bin"
             ],
             "dependsOn": [
                 "build",
