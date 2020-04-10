@@ -92,21 +92,21 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
                     {
-                        System.Console.WriteLine
+                        System.Console.Write
                         (
                             "ax: {0} ay: {1} az: {2}",
                             acc.X,
                             acc.Y,
                             acc.Z
                         );
-                        System.Console.WriteLine
+                        System.Console.Write
                         (
-                            "gx: {0} gy: {1} gz: {2}",
+                            "\tgx: {0:#6} gy: {1} gz: {2}",
                             g.X,
                             g.Y,
                             g.Z
                         );
-                        System.Console.WriteLine("Frequency: {0:.}", minCounter);
+                        System.Console.WriteLine("\tFrequency: {0:.}", minCounter);
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
                     }
