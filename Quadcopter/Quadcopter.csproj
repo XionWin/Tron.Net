@@ -16,6 +16,6 @@
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <Copy SourceFiles="..\library\bcm2835-1.63\libbcm2835.so" DestinationFolder="$(OutDir)" />
     <Copy SourceFiles="..\library\serial-1.00\libserial.so" DestinationFolder="$(OutDir)" />
-    <Copy SourceFiles="..\library\rt-1.00\librt.so" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="..\library\lnx-1.00\liblnx.so" DestinationFolder="$(OutDir)" />
   </Target>
 </Project>

@@ -15,6 +15,7 @@ extern "C"
 #endif
 
 	extern void set_realtime();
+	extern void sleep_us(unsigned int usecs);
 
 #ifdef __cplusplus
 }
