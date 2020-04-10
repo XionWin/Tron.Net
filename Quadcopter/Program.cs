@@ -84,7 +84,7 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
                     {
-                        System.Console.WriteLine("{0}", minCounter);
+                        System.Console.WriteLine("Frequency: {0:.}", minCounter);
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
                     }
