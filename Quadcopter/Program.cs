@@ -57,20 +57,22 @@ namespace Quadcopter
                         gyro.Read();
                     }
                     minCounter = Math.Min(target / (DateTime.Now - start).TotalSeconds, minCounter);
-                    if (minCounter < 4000)
+                    if (minCounter < 7000)
                     {
+                        System.Console.WriteLine("{0}: {1}",DateTime.Now.ToString(), minCounter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
                     else
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
-                    {
-                        System.Console.WriteLine("{0}", minCounter);
-                        lastUpdate = DateTime.Now;
-                        minCounter = double.MaxValue;
-                    }
+                    // if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    // {
+                    //     System.Console.WriteLine("{0}", minCounter);
+                    //     lastUpdate = DateTime.Now;
+                    //     minCounter = double.MaxValue;
+                    // }
+                    minCounter = double.MaxValue;
                     for (short i = target; i >= 0; i -= 1)
                     {
 #if ENABLE_MOTOR
