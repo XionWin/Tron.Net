@@ -5,6 +5,18 @@ namespace Tron.Device.Gyro.MPU9250
     public enum Register : byte
     {
         MODULE_ADDRESS = 0x68,
+        WHO_AM_I = 0x75,
+
+        AK8963_ADDRESS = 0x0C,
+        AK8963_WHO_AM_I = 0x00,
+        AK8963_CNTL = 0x0A,  // Power down (0000), single-measurement (0001), self-test (1000) and Fuse ROM (1111) modes on bits 3:0
+        AK8963_CNTL2 = 0x0B,  // Reset
+
+        AK8963_ASAX = 0x10,  // Fuse ROM x-axis sensitivity adjustment value
+        AK8963_ASAY = 0x11,  // Fuse ROM y-axis sensitivity adjustment value
+        AK8963_ASAZ = 0x12,  // Fuse ROM z-axis sensitivity adjustment value
+        EXT_SENS_DATA_00 = 0x49,
+
 
 
         USER_CTRL = 0x6A,  // Bit 7 enable DMP, bit 3 reset DMP
@@ -20,7 +32,6 @@ namespace Tron.Device.Gyro.MPU9250
         I2C_MST_DELAY_CTRL = 0x67,
         I2C_SLV4_CTRL = 0x34,
 
-        WHO_AM_I = 0x75,
 
         SMPLRT_DIV = 0x19,
         CONFIG = 0x1A,
@@ -67,6 +78,12 @@ namespace Tron.Device.Gyro.MPU9250
         YG_OFFSET_L = 0x16,
         ZG_OFFSET_H = 0x17,
         ZG_OFFSET_L = 0x18,
+
+
+        I2C_SLV0_ADDR = 0x25,
+        I2C_SLV0_REG = 0x26,
+        I2C_SLV0_CTRL = 0x27,
+        I2C_SLV0_DO = 0x63,
 
     }
 }

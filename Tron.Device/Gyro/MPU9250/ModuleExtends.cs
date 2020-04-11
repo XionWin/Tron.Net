@@ -2,13 +2,13 @@ using System;
 
 namespace Tron.Device.Gyro.MPU9250
 {
-    public partial class Module : Hardware.I2CDevice<Register>, IGyro
+    public partial class Module
     {
         private Ascale _ascale = Ascale.AFS_2G;
         private Gscale _gscale = Gscale.GFS_1000DPS;
         private byte _sampleRate = 0x04;
 
-        private void Initiailze()
+        private void initiailze()
         {
             if (this.ID != 0x71)
             {
@@ -69,15 +69,15 @@ namespace Tron.Device.Gyro.MPU9250
             // Set interrupt pin active high, push-pull, hold interrupt pin level HIGH until interrupt cleared,
             // clear on read of INT_STATUS, and enable I2C_BYPASS_EN so additional chips 
             // can join the I2C bus and all can be controlled by the Arduino as master
-            this.WriteByte(Register.INT_PIN_CFG, 0x10);		// INT is 50 microsecond pulse and any read to clear  
+            this.WriteByte(Register.INT_PIN_CFG, 0x22);		// INT is 50 microsecond pulse and any read to clear  
             this.WriteByte(Register.INT_ENABLE, 0x01);		// Enable data ready (bit 0) interrupt
             Hardware.Library.Delay(100);
 
-            this.WriteByte(Register.USER_CTRL, 0x20);		// Enable I2C Master mode  
-            this.WriteByte(Register.I2C_MST_CTRL, 0x1D);		// I2C configuration STOP after each transaction, master I2C bus at 400 KHz
-            this.WriteByte(Register.I2C_MST_DELAY_CTRL, 0x81);		// Use blocking data retreival and enable delay for mag sample rate mismatch
-            this.WriteByte(Register.I2C_SLV4_CTRL, 0x01);		// Delay mag data retrieval to once every other accel/gyro data sample
-            Hardware.Library.Delay(100);
+            // this.WriteByte(Register.USER_CTRL, 0x20);		// Enable I2C Master mode  
+            // this.WriteByte(Register.I2C_MST_CTRL, 0x1D);		// I2C configuration STOP after each transaction, master I2C bus at 400 KHz
+            // this.WriteByte(Register.I2C_MST_DELAY_CTRL, 0x81);		// Use blocking data retreival and enable delay for mag sample rate mismatch
+            // this.WriteByte(Register.I2C_SLV4_CTRL, 0x01);		// Delay mag data retrieval to once every other accel/gyro data sample
+            // Hardware.Library.Delay(100);
         }
 
 
@@ -249,12 +249,11 @@ namespace Tron.Device.Gyro.MPU9250
             dest2[1] = (float)gyro_bias[1] / (float)gyrosensitivity;
             dest2[2] = (float)gyro_bias[2] / (float)gyrosensitivity;
 
-            Hardware.Library.Delay(100);
-            this.Initiailze();
+            Hardware.Library.Delay(2000);
             return (dest1[0], dest1[1], dest1[2], dest2[0], dest2[1], dest2[2]);
         }
 
-        private void Reset()
+        private void reset()
         {
             // reset device
             this.WriteByte(Register.PWR_MGMT_1, 0x80); // Set bit 7 to reset MPU9250
@@ -263,7 +262,7 @@ namespace Tron.Device.Gyro.MPU9250
 
         byte[] _accel_buf = new byte[6];
 
-        private Core.Data.Vector3 ReadAccelData()
+        private Core.Data.Vector3 readAccelData()
         {
             this.Read(Register.ACCEL_XOUT_H, _accel_buf);
             return new Core.Data.Vector3(
@@ -274,7 +273,7 @@ namespace Tron.Device.Gyro.MPU9250
         }
 
         byte[] _gyro_buf = new byte[6];
-        private Core.Data.Vector3 ReadGyroData()
+        private Core.Data.Vector3 readGyroData()
         {
             this.Read(Register.GYRO_XOUT_H, _gyro_buf);
             return new Core.Data.Vector3(

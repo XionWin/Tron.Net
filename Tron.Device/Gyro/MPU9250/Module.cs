@@ -7,7 +7,6 @@ namespace Tron.Device.Gyro.MPU9250
         public Module()
             : base(new Hardware.I2C((byte)Register.MODULE_ADDRESS, Hardware.I2CClockDivider.CLOCK_DIVIDER_150))
         {
-            this.Initiailze();
         }
 
         public override byte ID
@@ -29,7 +28,6 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._ascale != value)
                 {
                     this._ascale = value;
-                    this.Initiailze();
                 }
             }
         }
@@ -42,7 +40,30 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._gscale != value)
                 {
                     this._gscale = value;
-                    this.Initiailze();
+                }
+            }
+        }
+
+        public Mscale Mscale
+        {
+            get => this._mscale;
+            set
+            {
+                if(this._mscale != value)
+                {
+                    this._mscale = value;
+                }
+            }
+        }
+
+        public Mmode Mmode
+        {
+            get => this._mmode;
+            set
+            {
+                if(this._mmode != value)
+                {
+                    this._mmode = value;
                 }
             }
         }
@@ -55,28 +76,33 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._sampleRate != value)
                 {
                     this._sampleRate = value;
-                    this.Initiailze();
                 }
             }
-        }
-
-        // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
-        // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-        public (float ax, float ay, float az, float gx, float gy, float gz) Calibrate()
-        {
-            return this.calibrate();
         }
         
         public Core.Data.Vector3 Accel
         {
-            get => this.ReadAccelData();
+            get => this.readAccelData();
         }
 
         public Core.Data.Vector3 Gyro
         {
-            get => this.ReadGyroData();
+            get => this.readGyroData();
         }
 
+        public void Initiailze()
+        {
+            this.initiailze();
+            this.initiailzeSlave();
+        }
 
+        public void Reset()
+        {
+            this.reset();
+        }
+        public (float ax, float ay, float az, float gx, float gy, float gz) Calibrate()
+        {
+            return this.calibrate();
+        }
     }
 }

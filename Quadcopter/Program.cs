@@ -27,7 +27,7 @@ namespace Quadcopter
 #endif
 
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
-
+                gyro.Reset();
                 System.Console.WriteLine("Calibrate gyro module...");
                 var c = gyro.Calibrate();
                 System.Console.WriteLine
@@ -40,6 +40,9 @@ namespace Quadcopter
                     c.gy,
                     c.gz
                 );
+
+                gyro.Initiailze();
+
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
@@ -92,20 +95,20 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
                     {
-                        // System.Console.Write
-                        // (
-                        //     "ax: {0} ay: {1} az: {2}\t",
-                        //     acc.X.ToString().PadLeft(6, ' '),
-                        //     acc.Y.ToString().PadLeft(6, ' '),
-                        //     acc.Z.ToString().PadLeft(6, ' ')
-                        // );
-                        // System.Console.Write
-                        // (
-                        //     "gx: {0} gy: {1} gz: {2}\t",
-                        //     g.X.ToString().PadLeft(6, ' '),
-                        //     g.Y.ToString().PadLeft(6, ' '),
-                        //     g.Z.ToString().PadLeft(6, ' ')
-                        // );
+                        System.Console.Write
+                        (
+                            "ax: {0} ay: {1} az: {2}\t",
+                            acc.X.ToString().PadLeft(6, ' '),
+                            acc.Y.ToString().PadLeft(6, ' '),
+                            acc.Z.ToString().PadLeft(6, ' ')
+                        );
+                        System.Console.Write
+                        (
+                            "gx: {0} gy: {1} gz: {2}\t",
+                            g.X.ToString().PadLeft(6, ' '),
+                            g.Y.ToString().PadLeft(6, ' '),
+                            g.Z.ToString().PadLeft(6, ' ')
+                        );
                         System.Console.WriteLine("Frequency: {0}", minCounter.ToString().PadLeft(4, ' '));
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
