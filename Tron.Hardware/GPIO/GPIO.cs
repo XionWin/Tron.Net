@@ -94,8 +94,7 @@ namespace Tron.Hardware
 #if DEBUG
 			catch (Exception e)
 			{
-				System.Console.WriteLine("Unable to create pin " + (uint)pin + ". Infomation: " + e.ToString());
-				return null;
+				throw new Exception("Unable to create pin " + (uint)pin + ". Infomation: " + e.ToString());
 			}
 #else
 			catch //stuff like lib load problems, wrong exports, etc...

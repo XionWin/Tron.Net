@@ -28,6 +28,7 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._ascale != value)
                 {
                     this._ascale = value;
+                    this._aRes = get_aRes(this._ascale);
                 }
             }
         }
@@ -40,6 +41,7 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._gscale != value)
                 {
                     this._gscale = value;
+                    this._gRes = get_gRes(this._gscale);
                 }
             }
         }
@@ -52,8 +54,22 @@ namespace Tron.Device.Gyro.MPU9250
                 if(this._mscale != value)
                 {
                     this._mscale = value;
+                    this._mRes = get_mRes(this._mscale);
                 }
             }
+        }
+
+        public float Ares
+        {
+            get => this._aRes;
+        }
+        public float Gres
+        {
+            get => this._gRes;
+        }
+        public float Mres
+        {
+            get => this._mRes;
         }
 
         public Mmode Mmode
@@ -84,10 +100,41 @@ namespace Tron.Device.Gyro.MPU9250
         {
             get => this.readAccelData();
         }
-
         public Core.Data.Vector3 Gyro
         {
             get => this.readGyroData();
+        }
+        public Core.Data.Vector3 Mag
+        {
+            get => this.readMagData();
+        }
+
+        
+        public Core.Data.Vector3 AccBias
+        {
+            get;
+            private set;
+        }
+        public Core.Data.Vector3 GyroBias
+        {
+            get;
+            private set;
+        }
+        
+        public Core.Data.Vector3 MagCalibration
+        {
+            get;
+            private set;
+        }
+        public Core.Data.Vector3 MagBias
+        {
+            get;
+            private set;
+        }
+        public Core.Data.Vector3 MagScale
+        {
+            get;
+            private set;
         }
 
         public void Initiailze()
@@ -104,13 +151,13 @@ namespace Tron.Device.Gyro.MPU9250
         {
             this.reset();
         }
-        public (float ax, float ay, float az, float gx, float gy, float gz) Calibrate()
+        public void Calibrate()
         {
-            return this.calibrate();
+            this.calibrate();
         }
-        public (float mbx, float mby, float mbz, float msx, float msy, float msz) CalibrateSlave()
+        public void CalibrateSlave()
         {
-            return this.calibrateSlave();
+            this.calibrateSlave();
         }
     }
 }

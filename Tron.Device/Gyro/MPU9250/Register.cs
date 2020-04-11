@@ -7,22 +7,22 @@ namespace Tron.Device.Gyro.MPU9250
         MODULE_ADDRESS = 0x68,
         WHO_AM_I = 0x75,
 
-        AK8963_ADDRESS = 0x0C,
-        AK8963_WHO_AM_I = 0x00,
-        AK8963_CNTL = 0x0A,  // Power down (0000), single-measurement (0001), self-test (1000) and Fuse ROM (1111) modes on bits 3:0
-        AK8963_CNTL2 = 0x0B,  // Reset
-
-        AK8963_ASAX = 0x10,  // Fuse ROM x-axis sensitivity adjustment value
-        AK8963_ASAY = 0x11,  // Fuse ROM y-axis sensitivity adjustment value
-        AK8963_ASAZ = 0x12,  // Fuse ROM z-axis sensitivity adjustment value
         EXT_SENS_DATA_00 = 0x49,
+        AK8963_MODULE_ADDRESS = AK8963.Register.MODULE_ADDRESS,
+        AK8963_WHO_AM_I = AK8963.Register.WHO_AM_I,
+        AK8963_CNTL = AK8963.Register.CNTL,
+        AK8963_CNTL2 = AK8963.Register.CNTL2,
 
-        AK8963_XOUT_L = 0x03,
-        AK8963_XOUT_H = 0x04,
-        AK8963_YOUT_L = 0x05,
-        AK8963_YOUT_H = 0x06,
-        AK8963_ZOUT_L = 0x07,
-        AK8963_ZOUT_H = 0x08,
+        AK8963_ASAX = AK8963.Register.ASAX,
+        AK8963_ASAY = AK8963.Register.ASAY,
+        AK8963_ASAZ = AK8963.Register.ASAZ,
+
+        AK8963_XOUT_L = AK8963.Register.XOUT_L,
+        AK8963_XOUT_H = AK8963.Register.XOUT_H,
+        AK8963_YOUT_L = AK8963.Register.YOUT_L,
+        AK8963_YOUT_H = AK8963.Register.YOUT_H,
+        AK8963_ZOUT_L = AK8963.Register.ZOUT_L,
+        AK8963_ZOUT_H = AK8963.Register.ZOUT_H,
 
 
 

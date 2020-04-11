@@ -4,9 +4,52 @@ namespace Tron.Device.Gyro.MPU9250
 {
     public partial class Module
     {
-        private Ascale _ascale = Ascale.AFS_2G;
-        private Gscale _gscale = Gscale.GFS_1000DPS;
+        private const Ascale ASCALE_DEFAULT_VALUE = Ascale.AFS_2G;
+        private const Gscale GSCALE_DEFAULT_VALUE = Gscale.GFS_1000DPS;
+        private Ascale _ascale = ASCALE_DEFAULT_VALUE;
+        private Gscale _gscale = GSCALE_DEFAULT_VALUE;
         private byte _sampleRate = 0x04;
+
+        private float _aRes = get_aRes(ASCALE_DEFAULT_VALUE);
+        private float _gRes = get_gRes(GSCALE_DEFAULT_VALUE);
+
+        private static float get_aRes(Ascale ascale)
+        {
+            switch (ascale)
+            {
+                // Possible accelerometer scales (and their register bit settings) are:
+                // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11). 
+                // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
+                case Ascale.AFS_2G:
+                    return 2.0f / 32768.0f;
+                case Ascale.AFS_4G:
+                    return 4.0f / 32768.0f;
+                case Ascale.AFS_8G:
+                    return 8.0f / 32768.0f;
+                case Ascale.AFS_16G:
+                    return 16.0f / 32768.0f;
+                default:
+                    throw new Exception("get_aRes error");
+            }
+        }
+        private static float get_gRes(Gscale gscale)
+        {
+            switch (gscale)
+            {
+                // Possible gyro scales (and their register bit settings) are:
+                // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11). 
+                case Gscale.GFS_250DPS:
+                    return 250.0f / 32768.0f;
+                case Gscale.GFS_500DPS:
+                    return 500.0f / 32768.0f;
+                case Gscale.GFS_1000DPS:
+                    return 1000.0f / 32768.0f;
+                case Gscale.GFS_2000DPS:
+                    return 2000.0f / 32768.0f;
+                default:
+                    throw new Exception("get_aRes error");
+            }
+        }
 
         private void initiailze()
         {
@@ -33,7 +76,7 @@ namespace Tron.Device.Gyro.MPU9250
 
             // Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV)
             this.WriteByte(Register.SMPLRT_DIV, this._sampleRate);        // Use a 200 Hz rate; a rate consistent with the filter update rate 
-                                                                    // determined inset in CONFIG above
+                                                                          // determined inset in CONFIG above
 
             // Set gyroscope full scale range
             // Range selects FS_SEL and AFS_SEL are 0 - 3, so 2-bit values are left-shifted into positions 4:3
@@ -43,7 +86,7 @@ namespace Tron.Device.Gyro.MPU9250
             c = (byte)(c & ~0x02);		// Clear Fchoice bits [1:0] 
             c = (byte)(c & ~0x18);		// Clear AFS bits [4:3]
             c = (byte)(c | (byte)this._gscale << 3);       // Set full scale range for the gyro
-                                                // c =| 0x00;		// Set Fchoice for the gyro to 11 by writing its inverse to bits 1:0 of GYRO_CONFIG
+                                                           // c =| 0x00;		// Set Fchoice for the gyro to 11 by writing its inverse to bits 1:0 of GYRO_CONFIG
             this.WriteByte(Register.GYRO_CONFIG, c);		// Write new GYRO_CONFIG value to register
 
             // Set accelerometer full-scale range configuration
@@ -83,7 +126,7 @@ namespace Tron.Device.Gyro.MPU9250
 
         // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
         // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-        private (float ax, float ay, float az, float gx, float gy, float gz) calibrate()
+        private void calibrate()
         {
             float[] dest1 = new float[3];
             float[] dest2 = new float[3];
@@ -222,9 +265,11 @@ namespace Tron.Device.Gyro.MPU9250
             // writeByte(MPU9250_ADDRESS, ZA_OFFSET_L, data[5]);
 
             // Output scaled accelerometer biases for display in the main program
-            dest1[0] = (float)accel_bias[0] / (float)accelsensitivity;
-            dest1[1] = (float)accel_bias[1] / (float)accelsensitivity;
-            dest1[2] = (float)accel_bias[2] / (float)accelsensitivity;
+            this.AccBias = new Core.Data.Vector3(
+                (float)accel_bias[0] / (float)accelsensitivity,
+                (float)accel_bias[1] / (float)accelsensitivity,
+                (float)accel_bias[2] / (float)accelsensitivity
+            );
 
 
 
@@ -245,12 +290,13 @@ namespace Tron.Device.Gyro.MPU9250
             this.WriteByte(Register.ZG_OFFSET_L, data_12[5]);
 
             // Output scaled gyro biases for display in the main program
-            dest2[0] = (float)gyro_bias[0] / (float)gyrosensitivity;
-            dest2[1] = (float)gyro_bias[1] / (float)gyrosensitivity;
-            dest2[2] = (float)gyro_bias[2] / (float)gyrosensitivity;
+            this.GyroBias = new Core.Data.Vector3(
+                (float)gyro_bias[0] / (float)gyrosensitivity,
+                (float)gyro_bias[1] / (float)gyrosensitivity,
+                (float)gyro_bias[2] / (float)gyrosensitivity
+            );
 
             Hardware.Library.Delay(200);
-            return (dest1[0], dest1[1], dest1[2], dest2[0], dest2[1], dest2[2]);
         }
 
         private void reset()

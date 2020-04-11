@@ -15,22 +15,22 @@ namespace Tron.Core.Data
         public double Q1
         {
             get;
-            private set;
+            set;
         }
         public double Q2
         {
             get;
-            private set;
+            set;
         }
         public double Q3
         {
             get;
-            private set;
+            set;
         }
         public double Q4
         {
             get;
-            private set;
+            set;
         }
     }
 }
