@@ -9,7 +9,6 @@
     <ProjectReference Include="..\Tron.Core\Tron.Core.csproj" />
     <ProjectReference Include="..\Tron.Hardware\Tron.Hardware.csproj" />
     <ProjectReference Include="..\Tron.Device\Tron.Device.csproj" />
-    <ProjectReference Include="..\Tron.Drawing\Tron.Drawing.csproj" />
     <ProjectReference Include="..\Tron.Linux\Tron.Linux.csproj" />
   </ItemGroup>
 
