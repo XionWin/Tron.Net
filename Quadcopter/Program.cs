@@ -90,23 +90,23 @@ namespace Quadcopter
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalSeconds > 1)
+                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
                     {
-                        System.Console.Write
-                        (
-                            "ax: {0} ay: {1} az: {2}",
-                            acc.X,
-                            acc.Y,
-                            acc.Z
-                        );
-                        System.Console.Write
-                        (
-                            "\tgx: {0:#6} gy: {1} gz: {2}",
-                            g.X,
-                            g.Y,
-                            g.Z
-                        );
-                        System.Console.WriteLine("\tFrequency: {0:.}", minCounter);
+                        // System.Console.Write
+                        // (
+                        //     "ax: {0} ay: {1} az: {2}\t",
+                        //     acc.X.ToString().PadLeft(6, ' '),
+                        //     acc.Y.ToString().PadLeft(6, ' '),
+                        //     acc.Z.ToString().PadLeft(6, ' ')
+                        // );
+                        // System.Console.Write
+                        // (
+                        //     "gx: {0} gy: {1} gz: {2}\t",
+                        //     g.X.ToString().PadLeft(6, ' '),
+                        //     g.Y.ToString().PadLeft(6, ' '),
+                        //     g.Z.ToString().PadLeft(6, ' ')
+                        // );
+                        System.Console.WriteLine("Frequency: {0}", minCounter.ToString().PadLeft(4, ' '));
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
                     }
