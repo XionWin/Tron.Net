@@ -17,6 +17,13 @@ namespace Tron.Device.Gyro.MPU9250
         AK8963_ASAZ = 0x12,  // Fuse ROM z-axis sensitivity adjustment value
         EXT_SENS_DATA_00 = 0x49,
 
+        AK8963_XOUT_L = 0x03,
+        AK8963_XOUT_H = 0x04,
+        AK8963_YOUT_L = 0x05,
+        AK8963_YOUT_H = 0x06,
+        AK8963_ZOUT_L = 0x07,
+        AK8963_ZOUT_H = 0x08,
+
 
 
         USER_CTRL = 0x6A,  // Bit 7 enable DMP, bit 3 reset DMP

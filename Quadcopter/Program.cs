@@ -19,6 +19,7 @@ namespace Quadcopter
 
             using (var indicator = new Tron.Device.Indicator.Module())
             {
+
 #if !ENABLE_LED
                 indicator.LEDSwitch = false;
 #endif
@@ -26,8 +27,13 @@ namespace Quadcopter
                 indicator.BuzzerSwitch = false;
 #endif
 
+                indicator.Status = Tron.Device.Indicator.IndicatorStatus.INIT;
+                
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
                 gyro.Reset();
+
+                gyro.Initiailze();
+
                 System.Console.WriteLine("Calibrate gyro module...");
                 var c = gyro.Calibrate();
                 System.Console.WriteLine
@@ -41,7 +47,21 @@ namespace Quadcopter
                     c.gz
                 );
 
-                gyro.Initiailze();
+                gyro.InitiailzeSlave();
+                System.Console.WriteLine("Wave device in a figure eight until done");
+                 var cs = gyro.CalibrateSlave();
+                System.Console.WriteLine
+                (
+                    "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
+                    cs.mbx,
+                    cs.mby,
+                    cs.mbz,
+                    cs.msx,
+                    cs.msy,
+                    cs.msz
+                );
+                System.Console.WriteLine("Mag Calibration done!");
+
 
 
 #if ENABLE_MOTOR

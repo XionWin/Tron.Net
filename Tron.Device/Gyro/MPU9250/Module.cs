@@ -93,6 +93,10 @@ namespace Tron.Device.Gyro.MPU9250
         public void Initiailze()
         {
             this.initiailze();
+        }
+
+        public void InitiailzeSlave()
+        {
             this.initiailzeSlave();
         }
 
@@ -103,6 +107,10 @@ namespace Tron.Device.Gyro.MPU9250
         public (float ax, float ay, float az, float gx, float gy, float gz) Calibrate()
         {
             return this.calibrate();
+        }
+        public (float mbx, float mby, float mbz, float msx, float msy, float msz) CalibrateSlave()
+        {
+            return this.calibrateSlave();
         }
     }
 }
