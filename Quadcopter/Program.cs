@@ -163,8 +163,8 @@ namespace Quadcopter
             var my = (m.Y * gyro.Mres * gyro.MagCalibration.Y - gyro.MagBias.Y) * gyro.MagScale.Y;
             var mz = (m.Z * gyro.Mres * gyro.MagCalibration.Z - gyro.MagBias.Z) * gyro.MagScale.Z;
 
-            deltat = ((DateTime.Now.Ticks - lastUpdate)/1000000); // set integration time by time elapsed since last filter update
-            lastUpdate = DateTime.Now.Ticks;
+            deltat = (DateTime.Now.Second + DateTime.Now.Millisecond / 1000 - lastUpdate); // set integration time by time elapsed since last filter update
+            lastUpdate = deltat;
 
             MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
@@ -188,8 +188,8 @@ namespace Quadcopter
         private static Tron.Core.Data.Quaternion q = new Tron.Core.Data.Quaternion(1, 0, 0, 0);
         private const double GyroMeasError = Math.PI * (60.0 / 180.0);
         private static readonly double beta = Math.Sqrt(3.0 / 4.0) * GyroMeasError;
-        private static long deltat = 0;
-        private static long lastUpdate = 0;
+        private static double deltat = 0;
+        private static double lastUpdate = 0;
         private static void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz)
         {
             double q1 = q.Q1, q2 = q.Q2, q3 = q.Q3, q4 = q.Q4;
