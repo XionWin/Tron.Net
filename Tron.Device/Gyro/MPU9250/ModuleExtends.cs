@@ -312,9 +312,9 @@ namespace Tron.Device.Gyro.MPU9250
         {
             this.Read(Register.ACCEL_XOUT_H, _accel_buf);
             return new Core.Data.Vector3(
-                (_accel_buf[0] << 8) | _accel_buf[1],
-                (_accel_buf[2] << 8) | _accel_buf[3],
-                (_accel_buf[4] << 8) | _accel_buf[5]
+                (short)((_accel_buf[0] << 8) | _accel_buf[1]),
+                (short)((_accel_buf[2] << 8) | _accel_buf[3]),
+                (short)((_accel_buf[4] << 8) | _accel_buf[5])
             );
         }
 
@@ -323,9 +323,9 @@ namespace Tron.Device.Gyro.MPU9250
         {
             this.Read(Register.GYRO_XOUT_H, _gyro_buf);
             return new Core.Data.Vector3(
-                (_gyro_buf[0] << 8) | _gyro_buf[1],
-                (_gyro_buf[2] << 8) | _gyro_buf[3],
-                (_gyro_buf[4] << 8) | _gyro_buf[5]
+                (short)((_gyro_buf[0] << 8) | _gyro_buf[1]),
+                (short)((_gyro_buf[2] << 8) | _gyro_buf[3]),
+                (short)((_gyro_buf[4] << 8) | _gyro_buf[5])
             );
         }
 

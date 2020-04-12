@@ -112,6 +112,29 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
                     {
+                        System.Console.Write
+                        (
+                            "ax: {0} ay: {1} az: {2}\t",
+                            _Accel.X.ToString("N2").PadLeft(4, ' '),
+                            _Accel.Y.ToString("N2").PadLeft(4, ' '),
+                            _Accel.Z.ToString("N2").PadLeft(4, ' ')
+                        );
+
+                        System.Console.Write
+                        (
+                            "gx: {0} gy: {1} gz: {2}\t",
+                            _Gyro.X.ToString("N2").PadLeft(4, ' '),
+                            _Gyro.Y.ToString("N2").PadLeft(4, ' '),
+                            _Gyro.Z.ToString("N2").PadLeft(4, ' ')
+                        );
+
+                        System.Console.Write
+                        (
+                            "mx: {0} my: {1} mz: {2}\t",
+                            _Mag.X.ToString("N2").PadLeft(4, ' '),
+                            _Mag.Y.ToString("N2").PadLeft(4, ' '),
+                            _Mag.Z.ToString("N2").PadLeft(4, ' ')
+                        );
 
                         System.Console.Write
                         (
@@ -120,6 +143,7 @@ namespace Quadcopter
                             eular.Roll,
                             eular.Yaw
                         );
+
 
                         System.Console.WriteLine("Frequency: {0}", minCounter.ToString().PadLeft(4, ' '));
                         lastUpdate = DateTime.Now;
@@ -143,7 +167,9 @@ namespace Quadcopter
             }
         }
 
-
+        private static Tron.Core.Data.Vector3 _Accel = new Tron.Core.Data.Vector3();
+        private static Tron.Core.Data.Vector3 _Gyro = new Tron.Core.Data.Vector3();
+        private static Tron.Core.Data.Vector3 _Mag = new Tron.Core.Data.Vector3();
         private static Tron.Core.Data.EularAngles read(Tron.Device.Gyro.MPU9250.Module gyro)
         {
 
@@ -163,24 +189,51 @@ namespace Quadcopter
             var my = (m.Y * gyro.Mres * gyro.MagCalibration.Y - gyro.MagBias.Y) * gyro.MagScale.Y;
             var mz = (m.Z * gyro.Mres * gyro.MagCalibration.Z - gyro.MagBias.Z) * gyro.MagScale.Z;
 
-            deltat = (DateTime.Now.Second + DateTime.Now.Millisecond / 1000 - lastUpdate); // set integration time by time elapsed since last filter update
-            lastUpdate = deltat;
+
+            _Accel = new Tron.Core.Data.Vector3(
+                ax,
+                ay,
+                az
+            );
+            _Gyro = new Tron.Core.Data.Vector3(
+                gx,
+                gy,
+                gz
+            );
+            _Mag = new Tron.Core.Data.Vector3(
+                mx,
+                my,
+                mz
+            );
+
+
+            // for (var i = 0; i < 10; i++)
+            // { // iterate a fixed number of times per data read cycle
+            //     deltat = (DateTime.Now.Ticks - lastUpdate) / 100000.0f; // set integration time by time elapsed since last filter update
+            //     lastUpdate = DateTime.Now.Ticks;
+
+            //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            // }
+
+            deltat = (DateTime.Now.Ticks - lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+            lastUpdate = DateTime.Now.Ticks;
 
             MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
-            var a12 =   2.0f * (q.Q2 * q.Q3 + q.Q1 * q.Q4);
-            var a22 =   q.Q1 * q.Q1 + q.Q2 * q.Q2 - q.Q3 * q.Q3 - q.Q4 * q.Q4;
-            var a31 =   2.0f * (q.Q1 * q.Q2 + q.Q3 * q.Q4);
-            var a32 =   2.0f * (q.Q2 * q.Q4 - q.Q1 * q.Q3);
-            var a33 =   q.Q1 * q.Q1 - q.Q2 * q.Q2 - q.Q3 * q.Q3 + q.Q4 * q.Q4;
+
+            var a12 = 2.0f * (q.Q2 * q.Q3 + q.Q1 * q.Q4);
+            var a22 = q.Q1 * q.Q1 + q.Q2 * q.Q2 - q.Q3 * q.Q3 - q.Q4 * q.Q4;
+            var a31 = 2.0f * (q.Q1 * q.Q2 + q.Q3 * q.Q4);
+            var a32 = 2.0f * (q.Q2 * q.Q4 - q.Q1 * q.Q3);
+            var a33 = q.Q1 * q.Q1 - q.Q2 * q.Q2 - q.Q3 * q.Q3 + q.Q4 * q.Q4;
             var pitch = -Math.Asin(a32);
-            var roll  = Math.Atan2(a31, a33);
-            var yaw   = Math.Atan2(a12, a22);
+            var roll = Math.Atan2(a31, a33);
+            var yaw = Math.Atan2(a12, a22);
             pitch *= 180.0f / Math.PI;
-            yaw   *= 180.0f / Math.PI; 
-            yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-            if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
-            roll  *= 180.0f / Math.PI;
+            yaw *= 180.0f / Math.PI;
+            yaw += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+            if (yaw < 0) yaw += 360.0f; // Ensure yaw stays between 0 and 360
+            roll *= 180.0f / Math.PI;
 
             return new Tron.Core.Data.EularAngles(pitch, roll, yaw);
         }
@@ -241,7 +294,7 @@ namespace Quadcopter
             // Normalise accelerometer measurement
             norm = Math.Sqrt(ax * ax + ay * ay + az * az);
             if (norm == 0.0f) return; // handle NaN
-            norm = 1.0f/norm;
+            norm = 1.0f / norm;
             ax *= norm;
             ay *= norm;
             az *= norm;
@@ -249,7 +302,7 @@ namespace Quadcopter
             // Normalise magnetometer measurement
             norm = Math.Sqrt(mx * mx + my * my + mz * mz);
             if (norm == 0.0f) return; // handle NaN
-            norm = 1.0f/norm;
+            norm = 1.0f / norm;
             mx *= norm;
             my *= norm;
             mz *= norm;
@@ -272,7 +325,7 @@ namespace Quadcopter
             s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - ax) + _2q4 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q3 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
             s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - ax) + _2q3 * (2.0f * q1q2 + _2q3q4 - ay) + (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
             norm = Math.Sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    // normalise step magnitude
-            norm = 1.0f/norm;
+            norm = 1.0f / norm;
             s1 *= norm;
             s2 *= norm;
             s3 *= norm;
@@ -290,7 +343,7 @@ namespace Quadcopter
             q3 += qDot3 * deltat;
             q4 += qDot4 * deltat;
             norm = Math.Sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
-            norm = 1.0f/norm;
+            norm = 1.0f / norm;
             q.Q1 = q1 * norm;
             q.Q2 = q2 * norm;
             q.Q3 = q3 * norm;

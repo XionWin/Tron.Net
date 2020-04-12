@@ -185,9 +185,9 @@ namespace Tron.Device.Gyro.MPU9250
             {
                 // Check if magnetic sensor overflow set, if not then report data
                 return new Core.Data.Vector3(
-                    (_mag_buf[1] << 8) | _mag_buf[0],
-                    (_mag_buf[3] << 8) | _mag_buf[2],
-                    (_mag_buf[5] << 8) | _mag_buf[4]
+                    (short)((_mag_buf[1] << 8) | _mag_buf[0]),
+                    (short)((_mag_buf[3] << 8) | _mag_buf[2]),
+                    (short)((_mag_buf[5] << 8) | _mag_buf[4])
                 );
             }
             else
