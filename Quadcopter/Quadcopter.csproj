@@ -10,6 +10,7 @@
     <ProjectReference Include="..\Tron.Hardware\Tron.Hardware.csproj" />
     <ProjectReference Include="..\Tron.Device\Tron.Device.csproj" />
     <ProjectReference Include="..\Tron.Linux\Tron.Linux.csproj" />
+    <ProjectReference Include="..\Tron.Flight\Tron.Flight.csproj" />
   </ItemGroup>
 
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">

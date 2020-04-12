@@ -89,7 +89,7 @@ namespace Tron.Device.Gyro.MPU9250
                                                                                              // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
             this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mscale << 4 | (byte)this.Mmode));        // Set magnetometer data resolution and sample ODR
             this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                     // Enable I2C and transfer 1 byte
-            Hardware.Library.Delay(50);
+            Hardware.Library.Delay(200);
         }
 
         private void calibrateSlave()
@@ -185,9 +185,9 @@ namespace Tron.Device.Gyro.MPU9250
             {
                 // Check if magnetic sensor overflow set, if not then report data
                 return new Core.Data.Vector3(
-                    (short)((_mag_buf[1] << 8) | _mag_buf[0]),
-                    (short)((_mag_buf[3] << 8) | _mag_buf[2]),
-                    (short)((_mag_buf[5] << 8) | _mag_buf[4])
+                    (short)(_mag_buf[1] << 8 | _mag_buf[0]),
+                    (short)(_mag_buf[3] << 8 | _mag_buf[2]),
+                    (short)(_mag_buf[5] << 8 | _mag_buf[4])
                 );
             }
             else

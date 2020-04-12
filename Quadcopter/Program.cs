@@ -34,35 +34,37 @@ namespace Quadcopter
 
                 gyro.Initiailze();
 
-                System.Console.WriteLine("Calibrate gyro module...");
+                // System.Console.WriteLine("Calibrate gyro module...");
                 gyro.Calibrate();
-                System.Console.WriteLine
-                (
-                    "ax: {0} ay: {1} az: {2}\ngx: {3} gy: {4} gz: {5}",
-                    gyro.AccBias.X,
-                    gyro.AccBias.Y,
-                    gyro.AccBias.Z,
-                    gyro.GyroBias.X,
-                    gyro.GyroBias.Y,
-                    gyro.GyroBias.Z
-                );
+                // System.Console.WriteLine
+                // (
+                //     "ax: {0} ay: {1} az: {2}\ngx: {3} gy: {4} gz: {5}",
+                //     gyro.AccBias.X,
+                //     gyro.AccBias.Y,
+                //     gyro.AccBias.Z,
+                //     gyro.GyroBias.X,
+                //     gyro.GyroBias.Y,
+                //     gyro.GyroBias.Z
+                // );
 
                 gyro.InitiailzeSlave();
-                System.Console.WriteLine("Wave device in a figure eight until done");
-                gyro.CalibrateSlave();
-                System.Console.WriteLine
-                (
-                    "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
-                    gyro.MagBias.X,
-                    gyro.MagBias.Y,
-                    gyro.MagBias.Z,
-                    gyro.MagScale.X,
-                    gyro.MagScale.Y,
-                    gyro.MagScale.Z
-                );
-                System.Console.WriteLine("Mag Calibration done!");
+                // System.Console.WriteLine("Wave device in a figure eight until done");
+                // gyro.CalibrateSlave();
+                // System.Console.WriteLine
+                // (
+                //     "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
+                //     gyro.MagBias.X,
+                //     gyro.MagBias.Y,
+                //     gyro.MagBias.Z,
+                //     gyro.MagScale.X,
+                //     gyro.MagScale.Y,
+                //     gyro.MagScale.Z
+                // );
+                // System.Console.WriteLine("Mag Calibration done!");
 
 
+                gyro.Initiailze();
+                gyro.InitiailzeSlave();
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
@@ -102,7 +104,7 @@ namespace Quadcopter
                     }
 
                     minCounter = Math.Min(target / (DateTime.Now - start).TotalSeconds, minCounter);
-                    if (minCounter < 3000)
+                    if (minCounter < 2000)
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
@@ -110,38 +112,38 @@ namespace Quadcopter
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
+                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 10)
                     {
                         System.Console.Write
                         (
                             "ax: {0} ay: {1} az: {2}\t",
-                            _Accel.X.ToString("N2").PadLeft(4, ' '),
-                            _Accel.Y.ToString("N2").PadLeft(4, ' '),
-                            _Accel.Z.ToString("N2").PadLeft(4, ' ')
+                            _Accel.X.ToString("N2").PadLeft(8, ' '),
+                            _Accel.Y.ToString("N2").PadLeft(8, ' '),
+                            _Accel.Z.ToString("N2").PadLeft(8, ' ')
                         );
 
                         System.Console.Write
                         (
                             "gx: {0} gy: {1} gz: {2}\t",
-                            _Gyro.X.ToString("N2").PadLeft(4, ' '),
-                            _Gyro.Y.ToString("N2").PadLeft(4, ' '),
-                            _Gyro.Z.ToString("N2").PadLeft(4, ' ')
+                            _Gyro.X.ToString("N2").PadLeft(8, ' '),
+                            _Gyro.Y.ToString("N2").PadLeft(8, ' '),
+                            _Gyro.Z.ToString("N2").PadLeft(8, ' ')
                         );
 
                         System.Console.Write
                         (
                             "mx: {0} my: {1} mz: {2}\t",
-                            _Mag.X.ToString("N2").PadLeft(4, ' '),
-                            _Mag.Y.ToString("N2").PadLeft(4, ' '),
-                            _Mag.Z.ToString("N2").PadLeft(4, ' ')
+                            _Mag.X.ToString("N2").PadLeft(8, ' '),
+                            _Mag.Y.ToString("N2").PadLeft(8, ' '),
+                            _Mag.Z.ToString("N2").PadLeft(8, ' ')
                         );
 
                         System.Console.Write
                         (
                             "PITCH: {0} ROLL: {1} YAW: {2}\t",
-                            eular.Pitch,
-                            eular.Roll,
-                            eular.Yaw
+                            eular.Pitch.ToString("N2").PadLeft(7, ' '),
+                            eular.Roll.ToString("N2").PadLeft(7, ' '),
+                            eular.Yaw.ToString("N2").PadLeft(7, ' ')
                         );
 
 
@@ -215,10 +217,13 @@ namespace Quadcopter
             //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
             // }
 
-            deltat = (DateTime.Now.Ticks - lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
-            lastUpdate = DateTime.Now.Ticks;
+            for (int i = 0; i < 10; i++)
+            {
+                deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
+                lastUpdate = DateTime.Now.Ticks;
 
-            MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+                MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            }
 
 
             var a12 = 2.0f * (q.Q2 * q.Q3 + q.Q1 * q.Q4);

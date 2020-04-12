@@ -115,7 +115,7 @@ namespace Tron.Device.Indicator
             get => this._status_queue.Count > 0 ? this._status_queue.Peek() : IndicatorStatus.NULL;
             set
             {
-                if (this._status_queue.LastOrDefault() != value)
+                if (this._status_queue.Count < 100 && this._status_queue.LastOrDefault() != value)
                 {
                     this._status_queue.Enqueue(value);
                 }

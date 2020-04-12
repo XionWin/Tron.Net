@@ -125,7 +125,7 @@ namespace Tron.Device.Gyro.MPU9250
         {
             get;
             private set;
-        }
+        } = new Core.Data.Vector3(1, 1, 1);
         public Core.Data.Vector3 MagBias
         {
             get;
@@ -135,7 +135,7 @@ namespace Tron.Device.Gyro.MPU9250
         {
             get;
             private set;
-        }
+        } = new Core.Data.Vector3(1, 1, 1);
 
         public void Initiailze()
         {

@@ -4,11 +4,11 @@ namespace Tron.Device.Gyro.MPU9250
 {
     public partial class Module
     {
-        private const Ascale ASCALE_DEFAULT_VALUE = Ascale.AFS_2G;
-        private const Gscale GSCALE_DEFAULT_VALUE = Gscale.GFS_1000DPS;
+        private const Ascale ASCALE_DEFAULT_VALUE = Ascale.AFS_8G;
+        private const Gscale GSCALE_DEFAULT_VALUE = Gscale.GFS_2000DPS;
         private Ascale _ascale = ASCALE_DEFAULT_VALUE;
         private Gscale _gscale = GSCALE_DEFAULT_VALUE;
-        private byte _sampleRate = 0x04;
+        private byte _sampleRate = 0x00;
 
         private float _aRes = get_aRes(ASCALE_DEFAULT_VALUE);
         private float _gRes = get_gRes(GSCALE_DEFAULT_VALUE);
@@ -66,13 +66,15 @@ namespace Tron.Device.Gyro.MPU9250
             this.WriteByte(Register.PWR_MGMT_1, 0x01);		// Auto select clock source to be PLL gyroscope reference if ready else
             Hardware.Library.Delay(200);
 
+            this.WriteByte(Register.PWR_MGMT_2, 0x00);
+
             // Configure Gyro and Thermometer
             // Disable FSYNC and set thermometer and gyro bandwidth to 41 and 42 Hz, respectively; 
             // minimum delay time for this setting is 5.9 ms, which means sensor fusion update rates cannot
             // be higher than 1 / 0.0059 = 170 Hz
             // DLPF_CFG = bits 2:0 = 011; this limits the sample rate to 1000 Hz for both
             // With the MPU9250, it is possible to get gyro sample rates of 32 kHz (!), 8 kHz, or 1 kHz
-            this.WriteByte(Register.CONFIG, 0x03);
+            this.WriteByte(Register.CONFIG, 0x02);
 
             // Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV)
             this.WriteByte(Register.SMPLRT_DIV, this._sampleRate);        // Use a 200 Hz rate; a rate consistent with the filter update rate 
@@ -102,7 +104,7 @@ namespace Tron.Device.Gyro.MPU9250
             // accel_fchoice_b bit [3]; in this case the bandwidth is 1.13 kHz
             c = this.ReadByte(Register.ACCEL_CONFIG_2);		// get current ACCEL_CONFIG2 register value
             c = (byte)(c & ~0x0F);		// Clear accel_fchoice_b (bit 3) and A_DLPFG (bits [2:0])  
-            c = (byte)(c | 0x03);		//Set accelerometer rate to 1 kHz and bandwidth to 41 Hz
+            c = (byte)(c | 0x00);		//Set accelerometer rate to 1 kHz and bandwidth to 41 Hz
             this.WriteByte(Register.ACCEL_CONFIG_2, c);		// Write new ACCEL_CONFIG2 register value
 
             // The accelerometer, gyro, and thermometer are set to 1 kHz sample rates, 
@@ -120,7 +122,7 @@ namespace Tron.Device.Gyro.MPU9250
             this.WriteByte(Register.I2C_MST_CTRL, 0x1D);		// I2C configuration STOP after each transaction, master I2C bus at 400 KHz
             this.WriteByte(Register.I2C_MST_DELAY_CTRL, 0x81);		// Use blocking data retreival and enable delay for mag sample rate mismatch
             this.WriteByte(Register.I2C_SLV4_CTRL, 0x01);		// Delay mag data retrieval to once every other accel/gyro data sample
-            Hardware.Library.Delay(100);
+            Hardware.Library.Delay(200);
         }
 
 
@@ -306,15 +308,16 @@ namespace Tron.Device.Gyro.MPU9250
             Hardware.Library.Delay(100); // Wait for all registers to reset 
         }
 
+
         byte[] _accel_buf = new byte[6];
 
         private Core.Data.Vector3 readAccelData()
         {
             this.Read(Register.ACCEL_XOUT_H, _accel_buf);
             return new Core.Data.Vector3(
-                (short)((_accel_buf[0] << 8) | _accel_buf[1]),
-                (short)((_accel_buf[2] << 8) | _accel_buf[3]),
-                (short)((_accel_buf[4] << 8) | _accel_buf[5])
+                (short)(_accel_buf[0] << 8 | _accel_buf[1]),
+                (short)(_accel_buf[2] << 8 | _accel_buf[3]),
+                (short)(_accel_buf[4] << 8 | _accel_buf[5])
             );
         }
 
@@ -323,9 +326,9 @@ namespace Tron.Device.Gyro.MPU9250
         {
             this.Read(Register.GYRO_XOUT_H, _gyro_buf);
             return new Core.Data.Vector3(
-                (short)((_gyro_buf[0] << 8) | _gyro_buf[1]),
-                (short)((_gyro_buf[2] << 8) | _gyro_buf[3]),
-                (short)((_gyro_buf[4] << 8) | _gyro_buf[5])
+                (short)(_gyro_buf[0] << 8 | _gyro_buf[1]),
+                (short)(_gyro_buf[2] << 8 | _gyro_buf[3]),
+                (short)(_gyro_buf[4] << 8 | _gyro_buf[5])
             );
         }
 
