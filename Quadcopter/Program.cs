@@ -32,10 +32,9 @@ namespace Quadcopter
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
                 gyro.Reset();
 
-                gyro.Initiailze();
 
                 // System.Console.WriteLine("Calibrate gyro module...");
-                gyro.Calibrate();
+                // gyro.Calibrate();
                 // System.Console.WriteLine
                 // (
                 //     "ax: {0} ay: {1} az: {2}\ngx: {3} gy: {4} gz: {5}",
@@ -47,7 +46,6 @@ namespace Quadcopter
                 //     gyro.GyroBias.Z
                 // );
 
-                gyro.InitiailzeSlave();
                 // System.Console.WriteLine("Wave device in a figure eight until done");
                 // gyro.CalibrateSlave();
                 // System.Console.WriteLine
@@ -62,9 +60,22 @@ namespace Quadcopter
                 // );
                 // System.Console.WriteLine("Mag Calibration done!");
 
-
                 gyro.Initiailze();
                 gyro.InitiailzeSlave();
+
+                System.Console.WriteLine("Wave device in a figure eight until done");
+                gyro.CalibrateSlave();
+                System.Console.WriteLine
+                (
+                    "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
+                    gyro.MagBias.X,
+                    gyro.MagBias.Y,
+                    gyro.MagBias.Z,
+                    gyro.MagScale.X,
+                    gyro.MagScale.Y,
+                    gyro.MagScale.Z
+                );
+                System.Console.WriteLine("Mag Calibration done!");
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
