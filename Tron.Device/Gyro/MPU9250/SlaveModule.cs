@@ -4,20 +4,20 @@ namespace Tron.Device.Gyro.MPU9250
 {
     public partial class Module
     {
-        private const Mscale MSCALE_DEFAULT_VALUE = Mscale.MFS_16BITS;
-        private Mscale _mscale = MSCALE_DEFAULT_VALUE;
+        private const MagFullScale MFS_DEFAULT_VALUE = MagFullScale.MFS_16BITS;
+        private MagFullScale _mfs = MFS_DEFAULT_VALUE;
         private Mmode _mmode = Mmode.M_100Hz;
-        private float _mRes = get_mRes(MSCALE_DEFAULT_VALUE);
+        private float _mRes = get_mRes(MFS_DEFAULT_VALUE);
 
-        private static float get_mRes(Mscale mscale)
+        private static float get_mRes(MagFullScale mscale)
         {
             switch (mscale)
             {
                 // Possible magnetometer scales (and their register bit settings) are:
                 // 14 bit resolution (0) and 16 bit resolution (1)
-                case Mscale.MFS_14BITS:
+                case MagFullScale.MFS_14BITS:
                     return 10.0f * 4912.0f / 8190.0f; // Proper scale to return milliGauss
-                case Mscale.MFS_16BITS:
+                case MagFullScale.MFS_16BITS:
                     return 10.0f * 4912.0f / 32760.0f; // Proper scale to return milliGauss
                 default:
                     throw new Exception("get_aRes error");
@@ -87,7 +87,7 @@ namespace Tron.Device.Gyro.MPU9250
                                                                                              // Configure the magnetometer for continuous read and highest resolution
                                                                                              // set Mscale bit 4 to 1 (0) to enable 16 (14) bit resolution in CNTL register,
                                                                                              // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
-            this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mscale << 4 | (byte)this.Mmode));        // Set magnetometer data resolution and sample ODR
+            this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mfs << 4 | (byte)this.Mmode));        // Set magnetometer data resolution and sample ODR
             this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                     // Enable I2C and transfer 1 byte
             Hardware.Library.Delay(200);
         }
@@ -106,7 +106,7 @@ namespace Tron.Device.Gyro.MPU9250
             var rawData_3 = new byte[3];
             var magCalibration = new float[3];
 
-            float _mRes = this._mscale == Mscale.MFS_14BITS ? 10.0f * 4912.0f / 8190.0f : 10.0f * 4912.0f / 32760.0f;
+            float _mRes = this._mfs == MagFullScale.MFS_14BITS ? 10.0f * 4912.0f / 8190.0f : 10.0f * 4912.0f / 32760.0f;
 
             var mag_scale = new int[3];
 

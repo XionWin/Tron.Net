@@ -72,6 +72,10 @@ namespace Tron.Device.Gyro.MPU9250
         MAG_ZOUT_L = 0x07,
         MAG_ZOUT_H = 0x08,
 
+        XG_OFFS_TC = 0x00,
+        YG_OFFS_TC = 0x01,
+        ZG_OFFS_TC = 0x02,
+
         XA_OFFSET_H = 0x77,
         XA_OFFSET_L = 0x78,
         YA_OFFSET_H = 0x7A,

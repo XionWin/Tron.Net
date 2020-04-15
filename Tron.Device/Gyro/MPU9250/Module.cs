@@ -20,41 +20,41 @@ namespace Tron.Device.Gyro.MPU9250
             set;
         }
 
-        public Ascale Ascale
+        public AccelFullScale Ascale
         {
-            get => this._ascale;
+            get => this._afs;
             set
             {
-                if(this._ascale != value)
+                if(this._afs != value)
                 {
-                    this._ascale = value;
-                    this._aRes = get_aRes(this._ascale);
+                    this._afs = value;
+                    this._aRes = get_aRes(this._afs);
                 }
             }
         }
 
-        public Gscale Gscale
+        public GyroFullScale Gscale
         {
-            get => this._gscale;
+            get => this._gfs;
             set
             {
-                if(this._gscale != value)
+                if(this._gfs != value)
                 {
-                    this._gscale = value;
-                    this._gRes = get_gRes(this._gscale);
+                    this._gfs = value;
+                    this._gRes = get_gRes(this._gfs);
                 }
             }
         }
 
-        public Mscale Mscale
+        public MagFullScale Mscale
         {
-            get => this._mscale;
+            get => this._mfs;
             set
             {
-                if(this._mscale != value)
+                if(this._mfs != value)
                 {
-                    this._mscale = value;
-                    this._mRes = get_mRes(this._mscale);
+                    this._mfs = value;
+                    this._mRes = get_mRes(this._mfs);
                 }
             }
         }

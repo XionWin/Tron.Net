@@ -2,7 +2,7 @@ using System;
 
 namespace Tron.Device.Gyro.MPU9250
 {
-    public enum Gscale : byte
+    public enum GyroFullScale : byte
     {
         GFS_250DPS = 0,
         GFS_500DPS = 1,

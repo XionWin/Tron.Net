@@ -4,47 +4,47 @@ namespace Tron.Device.Gyro.MPU9250
 {
     public partial class Module
     {
-        private const Ascale ASCALE_DEFAULT_VALUE = Ascale.AFS_8G;
-        private const Gscale GSCALE_DEFAULT_VALUE = Gscale.GFS_2000DPS;
-        private Ascale _ascale = ASCALE_DEFAULT_VALUE;
-        private Gscale _gscale = GSCALE_DEFAULT_VALUE;
+        private const AccelFullScale AFS_DEFAULT_VALUE = AccelFullScale.AFS_8G;
+        private const GyroFullScale GFS_DEFAULT_VALUE = GyroFullScale.GFS_2000DPS;
+        private AccelFullScale _afs = AFS_DEFAULT_VALUE;
+        private GyroFullScale _gfs = GFS_DEFAULT_VALUE;
         private byte _sampleRate = 0x00;
 
-        private float _aRes = get_aRes(ASCALE_DEFAULT_VALUE);
-        private float _gRes = get_gRes(GSCALE_DEFAULT_VALUE);
+        private float _aRes = get_aRes(AFS_DEFAULT_VALUE);
+        private float _gRes = get_gRes(GFS_DEFAULT_VALUE);
 
-        private static float get_aRes(Ascale ascale)
+        private static float get_aRes(AccelFullScale ascale)
         {
             switch (ascale)
             {
                 // Possible accelerometer scales (and their register bit settings) are:
                 // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11). 
                 // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
-                case Ascale.AFS_2G:
+                case AccelFullScale.AFS_2G:
                     return 2.0f / 32768.0f;
-                case Ascale.AFS_4G:
+                case AccelFullScale.AFS_4G:
                     return 4.0f / 32768.0f;
-                case Ascale.AFS_8G:
+                case AccelFullScale.AFS_8G:
                     return 8.0f / 32768.0f;
-                case Ascale.AFS_16G:
+                case AccelFullScale.AFS_16G:
                     return 16.0f / 32768.0f;
                 default:
                     throw new Exception("get_aRes error");
             }
         }
-        private static float get_gRes(Gscale gscale)
+        private static float get_gRes(GyroFullScale gscale)
         {
             switch (gscale)
             {
                 // Possible gyro scales (and their register bit settings) are:
                 // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11). 
-                case Gscale.GFS_250DPS:
+                case GyroFullScale.GFS_250DPS:
                     return 250.0f / 32768.0f;
-                case Gscale.GFS_500DPS:
+                case GyroFullScale.GFS_500DPS:
                     return 500.0f / 32768.0f;
-                case Gscale.GFS_1000DPS:
+                case GyroFullScale.GFS_1000DPS:
                     return 1000.0f / 32768.0f;
-                case Gscale.GFS_2000DPS:
+                case GyroFullScale.GFS_2000DPS:
                     return 2000.0f / 32768.0f;
                 default:
                     throw new Exception("get_aRes error");
@@ -87,8 +87,8 @@ namespace Tron.Device.Gyro.MPU9250
             // c = c & ~0xE0;		// Clear self-test bits [7:5] 
             c = (byte)(c & ~0x02);		// Clear Fchoice bits [1:0] 
             c = (byte)(c & ~0x18);		// Clear AFS bits [4:3]
-            c = (byte)(c | (byte)this._gscale << 3);       // Set full scale range for the gyro
-                                                           // c =| 0x00;		// Set Fchoice for the gyro to 11 by writing its inverse to bits 1:0 of GYRO_CONFIG
+            c = (byte)(c | (byte)this._gfs << 3);       // Set full scale range for the gyro
+                                                        // c =| 0x00;		// Set Fchoice for the gyro to 11 by writing its inverse to bits 1:0 of GYRO_CONFIG
             this.WriteByte(Register.GYRO_CONFIG, c);		// Write new GYRO_CONFIG value to register
 
             // Set accelerometer full-scale range configuration
@@ -96,7 +96,7 @@ namespace Tron.Device.Gyro.MPU9250
 
             // c = c & ~0xE0;		// Clear self-test bits [7:5] 
             c = (byte)(c & ~0x18);		// Clear AFS bits [4:3]
-            c = (byte)(c | (byte)this._ascale << 3);		// Set full scale range for the accelerometer 
+            c = (byte)(c | (byte)this._afs << 3);		// Set full scale range for the accelerometer 
             this.WriteByte(Register.ACCEL_CONFIG, c);		// Write new ACCEL_CONFIG register value
 
             // Set accelerometer sample rate configuration
@@ -303,9 +303,127 @@ namespace Tron.Device.Gyro.MPU9250
 
         private void reset()
         {
-            // reset device
-            this.WriteByte(Register.PWR_MGMT_1, 0x80); // Set bit 7 to reset MPU9250
-            Hardware.Library.Delay(100); // Wait for all registers to reset 
+            // bit 7 len 1
+            this.WriteByte(Register.PWR_MGMT_1, 0b_1000_0000);  // Set bit 7 to reset MPU9250
+            Hardware.Library.Delay(120);    // Wait for all registers to reset
+        }
+
+        private void setSleepEnabled(bool enable)
+        {
+            // bit 6 len 1
+            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte((enable ? 1 : 0) << 6));
+            Hardware.Library.Delay(10);
+
+            if (!enable)
+            {
+                this.WriteByte(Register.PWR_MGMT_1, 0x00);  // Clear sleep mode bit (6), enable all sensors
+                Hardware.Library.Delay(10);
+            }
+        }
+
+        private void setSampleRate(byte sampleRate)
+        {
+            // bit 7 len 8
+            this.WriteByte(Register.SMPLRT_DIV, sampleRate);
+            Hardware.Library.Delay(10);
+        }
+
+        private void setClockSource(ClockSource clockSource)
+        {
+            // * CLK_SEL | Clock Source
+            // * --------+--------------------------------------
+            // * 0       | Internal oscillator
+            // * 1       | PLL with X Gyro reference
+            // * 2       | PLL with Y Gyro reference
+            // * 3       | PLL with Z Gyro reference
+            // * 4       | PLL with external 32.768kHz reference
+            // * 5       | PLL with external 19.2MHz reference
+            // * 6       | Reserved
+            // * 7       | Stops the clock and keeps the timing generator in reset
+
+            // bit 2 len 3
+            byte mask = 0b_0000_0111;
+            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte(Convert.ToByte(clockSource) & mask));
+            Hardware.Library.Delay(10);
+        }
+
+        private void setDLPFMode(DLPFMode mode)
+        {
+            //  *          |   ACCELEROMETER    |           GYROSCOPE
+            //  * DLPF_CFG | Bandwidth | Delay  | Bandwidth | Delay  | Sample Rate
+            //  * ---------+-----------+--------+-----------+--------+-------------
+            //  * 0        | 260Hz     | 0ms    | 256Hz     | 0.98ms | 8kHz
+            //  * 1        | 184Hz     | 2.0ms  | 188Hz     | 1.9ms  | 1kHz
+            //  * 2        | 94Hz      | 3.0ms  | 98Hz      | 2.8ms  | 1kHz
+            //  * 3        | 44Hz      | 4.9ms  | 42Hz      | 4.8ms  | 1kHz
+            //  * 4        | 21Hz      | 8.5ms  | 20Hz      | 8.3ms  | 1kHz
+            //  * 5        | 10Hz      | 13.8ms | 10Hz      | 13.4ms | 1kHz
+            //  * 6        | 5Hz       | 19.0ms | 5Hz       | 18.6ms | 1kHz
+            //  * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
+
+            // bit 2 len 3
+            byte mask = 0b_0000_0111;
+            this.WriteByte(Register.CONFIG, Convert.ToByte(Convert.ToByte(mode) & mask));
+            Hardware.Library.Delay(10);
+        }
+
+        private void setAccelFullScaleRange(AccelFullScale afs)
+        {
+            //  * 0 = +/- 2g
+            //  * 1 = +/- 4g
+            //  * 2 = +/- 8g
+            //  * 3 = +/- 16g
+
+            // bit 4 len 2
+            byte mask = 0b_0001_1000;
+            this.WriteByte(Register.ACCEL_CONFIG, Convert.ToByte(Convert.ToByte(afs) << 4 & mask));
+            Hardware.Library.Delay(10);
+        }
+
+        private void setGyroFullScaleRange(GyroFullScale gfs)
+        {
+            //  * 0 = +/- 250 degrees/sec
+            //  * 1 = +/- 500 degrees/sec
+            //  * 2 = +/- 1000 degrees/sec
+            //  * 3 = +/- 2000 degrees/sec
+
+            // bit 4 len 2
+            byte mask = 0b_0001_1000;
+            this.WriteByte(Register.GYRO_CONFIG, Convert.ToByte(Convert.ToByte(gfs) << 4 & mask));
+            Hardware.Library.Delay(10);
+        }
+
+        private byte getGyroXOffset()
+        {
+            //bit 6 len 6
+            byte mark = 0b_0011_1111;
+            var b = this.ReadByte(Register.XG_OFFS_TC);
+
+            return Convert.ToByte(b >> 1 & mark);
+        }
+        private void setGyroXOffset(byte offset)
+        {
+            //bit 6 len 6
+            byte mark = 0b_0111_1110;
+            var b = this.ReadByte(Register.XG_OFFS_TC);
+
+            return Convert.ToByte(b >> 1 & mark);
+        }
+        private byte getGyroYOffset()
+        {
+            //bit 6 len 6
+            byte mark = 0b_0011_1111;
+            var b = this.ReadByte(Register.YG_OFFS_TC);
+
+            return Convert.ToByte(b >> 1 & mark);
+        }
+        private byte getGyroZOffset()
+        {
+            //bit 6 len 6
+            byte mark = 0b_0011_1111;
+            var b = this.ReadByte(Register.ZG_OFFS_TC);
+
+            return Convert.ToByte(b >> 1 & mark);
         }
 
 
