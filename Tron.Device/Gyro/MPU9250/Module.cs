@@ -139,7 +139,7 @@ namespace Tron.Device.Gyro.MPU9250
 
         public void Initiailze()
         {
-            this.initiailze();
+            this.initiailze2();
         }
 
         public void InitiailzeSlave()
@@ -147,10 +147,6 @@ namespace Tron.Device.Gyro.MPU9250
             this.initiailzeSlave();
         }
 
-        public void Reset()
-        {
-            this.reset();
-        }
         public void Calibrate()
         {
             this.calibrate();

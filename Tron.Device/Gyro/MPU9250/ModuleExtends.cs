@@ -126,6 +126,38 @@ namespace Tron.Device.Gyro.MPU9250
         }
 
 
+        private void initiailze2()
+        {
+            if (this.ID != 0x71)
+            {
+                throw new Exception("MPU9250 module initialize error");
+            }
+
+            this.reset();
+
+            this.setSleepEnabled(false);
+            var xOffset = this.getGyroXOffset();
+            var yOffset = this.getGyroYOffset();
+            var zOffset = this.getGyroZOffset();
+
+            this.setSampleRate(0x00);
+
+            this.setClockSource(ClockSource.CLOCK_PLL_ZGYRO);
+
+            this.setDLPFMode(DLPFMode.DLPF_BW_188);
+
+            this.setGyroFullScaleRange(GyroFullScale.GFS_2000DPS);
+
+            this.setGyroXOffset(xOffset);
+            this.setGyroXOffset(yOffset);
+            this.setGyroXOffset(zOffset);
+
+            this.setAccelFullScaleRange(AccelFullScale.AFS_8G);
+
+
+        }
+
+
         // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
         // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
         private void calibrate()
@@ -303,15 +335,26 @@ namespace Tron.Device.Gyro.MPU9250
 
         private void reset()
         {
+            //  * CLK_SEL | Clock Source
+            //  * --------+--------------------------------------
+            //  * 0       | Internal oscillator
+            //  * 1       | PLL with X Gyro reference
+            //  * 2       | PLL with Y Gyro reference
+            //  * 3       | PLL with Z Gyro reference
+            //  * 4       | PLL with external 32.768kHz reference
+            //  * 5       | PLL with external 19.2MHz reference
+            //  * 6       | Reserved
+            //  * 7       | Stops the clock and keeps the timing generator in reset
+
             // bit 7 len 1
-            this.WriteByte(Register.PWR_MGMT_1, 0b_1000_0000);  // Set bit 7 to reset MPU9250
+            this.WriteBit(Register.PWR_MGMT_1, 0x07, true);
             Hardware.Library.Delay(120);    // Wait for all registers to reset
         }
 
         private void setSleepEnabled(bool enable)
         {
             // bit 6 len 1
-            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte((enable ? 1 : 0) << 6));
+            this.WriteBit(Register.PWR_MGMT_1, 6, enable);
             Hardware.Library.Delay(10);
 
             if (!enable)
@@ -342,9 +385,7 @@ namespace Tron.Device.Gyro.MPU9250
             // * 7       | Stops the clock and keeps the timing generator in reset
 
             // bit 2 len 3
-            byte bitStart = 2, len = 3;
-            byte mask = 0b_0000_0111;
-            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte(Convert.ToByte(clockSource) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.PWR_MGMT_1, 2, 3, Convert.ToByte(clockSource));
             Hardware.Library.Delay(10);
         }
 
@@ -363,9 +404,7 @@ namespace Tron.Device.Gyro.MPU9250
             //  * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
 
             // bit 2 len 3
-            byte mask = 0b_0000_0111;
-            byte bitStart = 2, len = 3;
-            this.WriteByte(Register.CONFIG, Convert.ToByte(Convert.ToByte(mode) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.CONFIG, 2, 3, Convert.ToByte(mode));
             Hardware.Library.Delay(10);
         }
 
@@ -377,9 +416,7 @@ namespace Tron.Device.Gyro.MPU9250
             //  * 3 = +/- 16g
 
             // bit 4 len 2
-            byte mask = 0b_0001_1000;
-            byte bitStart = 4, len = 2;
-            this.WriteByte(Register.ACCEL_CONFIG, Convert.ToByte(Convert.ToByte(afs) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.ACCEL_CONFIG, 4, 2, Convert.ToByte(afs));
             Hardware.Library.Delay(10);
         }
 
@@ -391,61 +428,41 @@ namespace Tron.Device.Gyro.MPU9250
             //  * 3 = +/- 2000 degrees/sec
 
             // bit 4 len 2
-            byte mask = 0b_0001_1000;
-            byte bitStart = 4, len = 2;
-            this.WriteByte(Register.GYRO_CONFIG, Convert.ToByte(Convert.ToByte(gfs) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.GYRO_CONFIG, 4, 2, Convert.ToByte(gfs));
             Hardware.Library.Delay(10);
         }
 
         private byte getGyroXOffset()
         {
             //bit 6 len 6
-            byte mark = 0b_0011_1111;
-            byte bitStart = 6, len = 6;
-            var b = this.ReadByte(Register.XG_OFFS_TC);
-
-            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
+            return this.ReadBits(Register.XG_OFFS_TC, 6, 6);
         }
         private void setGyroXOffset(byte offset)
         {
             //bit 6 len 6
-            byte mask = 0b_0111_1110;
-            byte bitStart = 6, len = 6;
-            this.WriteByte(Register.XG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.XG_OFFS_TC, 6, 6, offset);
         }
 
         private byte getGyroYOffset()
         {
             //bit 6 len 6
-            byte mark = 0b_0011_1111;
-            byte bitStart = 6, len = 6;
-            var b = this.ReadByte(Register.YG_OFFS_TC);
-
-            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
+            return this.ReadBits(Register.YG_OFFS_TC, 6, 6);
         }
         private void setGyroYOffset(byte offset)
         {
             //bit 6 len 6
-            byte mask = 0b_0111_1110;
-            byte bitStart = 6, len = 6;
-            this.WriteByte(Register.YG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.YG_OFFS_TC, 6, 6, offset);
         }
 
         private byte getGyroZOffset()
         {
             //bit 6 len 6
-            byte mark = 0b_0011_1111;
-            byte bitStart = 6, len = 6;
-            var b = this.ReadByte(Register.ZG_OFFS_TC);
-
-            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
+            return this.ReadBits(Register.ZG_OFFS_TC, 6, 6);
         }
         private void setGyroZOffset(byte offset)
         {
             //bit 6 len 6
-            byte mask = 0b_0111_1110;
-            byte bitStart = 6, len = 6;
-            this.WriteByte(Register.ZG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
+            this.WriteBits(Register.ZG_OFFS_TC, 6, 6, offset);
         }
 
 

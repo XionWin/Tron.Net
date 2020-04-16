@@ -15,6 +15,45 @@ namespace Tron.Hardware
             get;
         }
 
+        
+        protected bool ReadBbit(RT addr, byte bitNum)
+        {
+            return this.BUS.ReadBit(Convert.ToByte(addr), bitNum);
+        }
+        protected void WriteBit(byte addr, byte bitNum, bool value)
+        {
+            if(this.BUS.WriteBit(addr, bitNum, value) != Hardware.I2CReasonCodes.REASON_OK)
+            {
+                throw new Exception("I2C WriteByte error");
+            }
+        }
+        protected void WriteBit(RT addr, byte bitNum, bool value)
+        {
+            if(this.BUS.WriteBit(Convert.ToByte(addr), bitNum, value) != Hardware.I2CReasonCodes.REASON_OK)
+            {
+                throw new Exception("I2C WriteByte error");
+            }
+        }
+        
+        protected byte ReadBits(RT addr, byte bitStart, byte len)
+        {
+            return this.BUS.ReadBits(Convert.ToByte(addr), bitStart, len);
+        }
+        protected void WriteBits(byte addr, byte bitStart, byte len, byte value)
+        {
+            if(this.BUS.WriteBits(addr, bitStart, len, value) != Hardware.I2CReasonCodes.REASON_OK)
+            {
+                throw new Exception("I2C WriteByte error");
+            }
+        }
+        protected void WriteBits(RT addr, byte bitStart, byte len, byte value)
+        {
+            if(this.BUS.WriteBits(Convert.ToByte(addr), bitStart, len, value) != Hardware.I2CReasonCodes.REASON_OK)
+            {
+                throw new Exception("I2C WriteByte error");
+            }
+        }
+
         protected byte ReadByte(RT addr)
         {
             return this.BUS.ReadByte(Convert.ToByte(addr));

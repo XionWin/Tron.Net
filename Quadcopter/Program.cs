@@ -1,4 +1,4 @@
-﻿// #define ENABLE_LED
+﻿#define ENABLE_LED
 // #define ENABLE_BUZZER
 // #define ENABLE_MOTOR
 
@@ -30,7 +30,6 @@ namespace Quadcopter
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.INIT;
 
                 var gyro = new Tron.Device.Gyro.MPU9250.Module();
-                gyro.Reset();
 
 
                 // System.Console.WriteLine("Calibrate gyro module...");
@@ -63,19 +62,19 @@ namespace Quadcopter
                 gyro.Initiailze();
                 gyro.InitiailzeSlave();
 
-                System.Console.WriteLine("Wave device in a figure eight until done");
-                gyro.CalibrateSlave();
-                System.Console.WriteLine
-                (
-                    "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
-                    gyro.MagBias.X,
-                    gyro.MagBias.Y,
-                    gyro.MagBias.Z,
-                    gyro.MagScale.X,
-                    gyro.MagScale.Y,
-                    gyro.MagScale.Z
-                );
-                System.Console.WriteLine("Mag Calibration done!");
+                // System.Console.WriteLine("Wave device in a figure eight until done");
+                // gyro.CalibrateSlave();
+                // System.Console.WriteLine
+                // (
+                //     "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
+                //     gyro.MagBias.X,
+                //     gyro.MagBias.Y,
+                //     gyro.MagBias.Z,
+                //     gyro.MagScale.X,
+                //     gyro.MagScale.Y,
+                //     gyro.MagScale.Z
+                // );
+                // System.Console.WriteLine("Mag Calibration done!");
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
