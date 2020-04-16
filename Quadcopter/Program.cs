@@ -76,7 +76,7 @@ namespace Quadcopter
                 // );
                 // System.Console.WriteLine("Mag Calibration done!");
 
-                
+
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
@@ -220,22 +220,17 @@ namespace Quadcopter
                 mz
             );
 
-
-            // for (var i = 0; i < 10; i++)
-            // { // iterate a fixed number of times per data read cycle
-            //     deltat = (DateTime.Now.Ticks - lastUpdate) / 100000.0f; // set integration time by time elapsed since last filter update
+            // for (int i = 0; i < 10; i++)
+            // {
+            //     deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
             //     lastUpdate = DateTime.Now.Ticks;
 
             //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
             // }
 
-            for (int i = 0; i < 10; i++)
-            {
-                deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
-                lastUpdate = DateTime.Now.Ticks;
-
-                MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
-            }
+            deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
+            lastUpdate = DateTime.Now.Ticks;
+            MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
 
             var a12 = 2.0f * (q.Q2 * q.Q3 + q.Q1 * q.Q4);
