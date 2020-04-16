@@ -62,19 +62,19 @@ namespace Quadcopter
                 gyro.Initiailze();
                 gyro.InitiailzeSlave();
 
-                // System.Console.WriteLine("Wave device in a figure eight until done");
-                // gyro.CalibrateSlave();
-                // System.Console.WriteLine
-                // (
-                //     "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
-                //     gyro.MagBias.X,
-                //     gyro.MagBias.Y,
-                //     gyro.MagBias.Z,
-                //     gyro.MagScale.X,
-                //     gyro.MagScale.Y,
-                //     gyro.MagScale.Z
-                // );
-                // System.Console.WriteLine("Mag Calibration done!");
+                System.Console.WriteLine("Wave device in a figure eight until done");
+                gyro.CalibrateSlave();
+                System.Console.WriteLine
+                (
+                    "mbx: {0} mby: {1} az: {2}\nmsx: {3} msy: {4} msz: {5}",
+                    gyro.MagBias.X,
+                    gyro.MagBias.Y,
+                    gyro.MagBias.Z,
+                    gyro.MagScale.X,
+                    gyro.MagScale.Y,
+                    gyro.MagScale.Z
+                );
+                System.Console.WriteLine("Mag Calibration done!");
 
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
@@ -124,29 +124,29 @@ namespace Quadcopter
                     }
                     if ((DateTime.Now - lastUpdate).TotalMilliseconds > 10)
                     {
-                        System.Console.Write
-                        (
-                            "ax: {0} ay: {1} az: {2}\t",
-                            _Accel.X.ToString("N2").PadLeft(8, ' '),
-                            _Accel.Y.ToString("N2").PadLeft(8, ' '),
-                            _Accel.Z.ToString("N2").PadLeft(8, ' ')
-                        );
+                        // System.Console.Write
+                        // (
+                        //     "ax: {0} ay: {1} az: {2}\t",
+                        //     _Accel.X.ToString("N2").PadLeft(8, ' '),
+                        //     _Accel.Y.ToString("N2").PadLeft(8, ' '),
+                        //     _Accel.Z.ToString("N2").PadLeft(8, ' ')
+                        // );
 
-                        System.Console.Write
-                        (
-                            "gx: {0} gy: {1} gz: {2}\t",
-                            _Gyro.X.ToString("N2").PadLeft(8, ' '),
-                            _Gyro.Y.ToString("N2").PadLeft(8, ' '),
-                            _Gyro.Z.ToString("N2").PadLeft(8, ' ')
-                        );
+                        // System.Console.Write
+                        // (
+                        //     "gx: {0} gy: {1} gz: {2}\t",
+                        //     _Gyro.X.ToString("N2").PadLeft(8, ' '),
+                        //     _Gyro.Y.ToString("N2").PadLeft(8, ' '),
+                        //     _Gyro.Z.ToString("N2").PadLeft(8, ' ')
+                        // );
 
-                        System.Console.Write
-                        (
-                            "mx: {0} my: {1} mz: {2}\t",
-                            _Mag.X.ToString("N2").PadLeft(8, ' '),
-                            _Mag.Y.ToString("N2").PadLeft(8, ' '),
-                            _Mag.Z.ToString("N2").PadLeft(8, ' ')
-                        );
+                        // System.Console.Write
+                        // (
+                        //     "mx: {0} my: {1} mz: {2}\t",
+                        //     _Mag.X.ToString("N2").PadLeft(8, ' '),
+                        //     _Mag.Y.ToString("N2").PadLeft(8, ' '),
+                        //     _Mag.Z.ToString("N2").PadLeft(8, ' ')
+                        // );
 
                         System.Console.Write
                         (

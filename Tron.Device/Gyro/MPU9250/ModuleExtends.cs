@@ -466,17 +466,6 @@ namespace Tron.Device.Gyro.MPU9250
         }
 
 
-        private static int GETWRITEBIAS(byte bitStart, byte len)
-        {
-            return bitStart - len + 1;
-        }
-
-        private static int GETREADBIAS(byte bitStart, byte len)
-        {
-            return bitStart - len;
-        }
-
-
         byte[] _accel_buf = new byte[6];
 
         private Core.Data.Vector3 readAccelData()
