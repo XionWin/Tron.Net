@@ -139,7 +139,7 @@ namespace Tron.Device.Gyro.MPU9250
 
         public void Initiailze()
         {
-            this.initiailze2();
+            this.initiailze();
         }
 
         public void InitiailzeSlave()

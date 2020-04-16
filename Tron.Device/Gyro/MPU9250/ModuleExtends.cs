@@ -58,81 +58,6 @@ namespace Tron.Device.Gyro.MPU9250
                 throw new Exception("MPU9250 module initialize error");
             }
 
-            // wake up device
-            this.WriteByte(Register.PWR_MGMT_1, 0x00);		// Clear sleep mode bit (6), enable all sensors 
-            Hardware.Library.Delay(100);
-
-            // get stable time source
-            this.WriteByte(Register.PWR_MGMT_1, 0x01);		// Auto select clock source to be PLL gyroscope reference if ready else
-            Hardware.Library.Delay(200);
-
-            this.WriteByte(Register.PWR_MGMT_2, 0x00);
-
-            // Configure Gyro and Thermometer
-            // Disable FSYNC and set thermometer and gyro bandwidth to 41 and 42 Hz, respectively; 
-            // minimum delay time for this setting is 5.9 ms, which means sensor fusion update rates cannot
-            // be higher than 1 / 0.0059 = 170 Hz
-            // DLPF_CFG = bits 2:0 = 011; this limits the sample rate to 1000 Hz for both
-            // With the MPU9250, it is possible to get gyro sample rates of 32 kHz (!), 8 kHz, or 1 kHz
-            this.WriteByte(Register.CONFIG, 0x02);
-
-            // Set sample rate = gyroscope output rate/(1 + SMPLRT_DIV)
-            this.WriteByte(Register.SMPLRT_DIV, this._sampleRate);        // Use a 200 Hz rate; a rate consistent with the filter update rate 
-                                                                          // determined inset in CONFIG above
-
-            // Set gyroscope full scale range
-            // Range selects FS_SEL and AFS_SEL are 0 - 3, so 2-bit values are left-shifted into positions 4:3
-            byte c = this.ReadByte(Register.GYRO_CONFIG);		// get current GYRO_CONFIG register value
-
-            // c = c & ~0xE0;		// Clear self-test bits [7:5] 
-            c = (byte)(c & ~0x02);		// Clear Fchoice bits [1:0] 
-            c = (byte)(c & ~0x18);		// Clear AFS bits [4:3]
-            c = (byte)(c | (byte)this._gfs << 3);       // Set full scale range for the gyro
-                                                        // c =| 0x00;		// Set Fchoice for the gyro to 11 by writing its inverse to bits 1:0 of GYRO_CONFIG
-            this.WriteByte(Register.GYRO_CONFIG, c);		// Write new GYRO_CONFIG value to register
-
-            // Set accelerometer full-scale range configuration
-            c = this.ReadByte(Register.ACCEL_CONFIG);		// get current ACCEL_CONFIG register value
-
-            // c = c & ~0xE0;		// Clear self-test bits [7:5] 
-            c = (byte)(c & ~0x18);		// Clear AFS bits [4:3]
-            c = (byte)(c | (byte)this._afs << 3);		// Set full scale range for the accelerometer 
-            this.WriteByte(Register.ACCEL_CONFIG, c);		// Write new ACCEL_CONFIG register value
-
-            // Set accelerometer sample rate configuration
-            // It is possible to get a 4 kHz sample rate from the accelerometer by choosing 1 for
-            // accel_fchoice_b bit [3]; in this case the bandwidth is 1.13 kHz
-            c = this.ReadByte(Register.ACCEL_CONFIG_2);		// get current ACCEL_CONFIG2 register value
-            c = (byte)(c & ~0x0F);		// Clear accel_fchoice_b (bit 3) and A_DLPFG (bits [2:0])  
-            c = (byte)(c | 0x00);		//Set accelerometer rate to 1 kHz and bandwidth to 41 Hz
-            this.WriteByte(Register.ACCEL_CONFIG_2, c);		// Write new ACCEL_CONFIG2 register value
-
-            // The accelerometer, gyro, and thermometer are set to 1 kHz sample rates, 
-            // but all these rates are further reduced by a factor of 5 to 200 Hz because of the SMPLRT_DIV setting
-
-            // Configure Interrupts and Bypass Enable
-            // Set interrupt pin active high, push-pull, hold interrupt pin level HIGH until interrupt cleared,
-            // clear on read of INT_STATUS, and enable I2C_BYPASS_EN so additional chips 
-            // can join the I2C bus and all can be controlled by the Arduino as master
-            this.WriteByte(Register.INT_PIN_CFG, 0x10);		// INT is 50 microsecond pulse and any read to clear  
-            this.WriteByte(Register.INT_ENABLE, 0x01);		// Enable data ready (bit 0) interrupt
-            Hardware.Library.Delay(100);
-
-            this.WriteByte(Register.USER_CTRL, 0x20);		// Enable I2C Master mode  
-            this.WriteByte(Register.I2C_MST_CTRL, 0x1D);		// I2C configuration STOP after each transaction, master I2C bus at 400 KHz
-            this.WriteByte(Register.I2C_MST_DELAY_CTRL, 0x81);		// Use blocking data retreival and enable delay for mag sample rate mismatch
-            this.WriteByte(Register.I2C_SLV4_CTRL, 0x01);		// Delay mag data retrieval to once every other accel/gyro data sample
-            Hardware.Library.Delay(200);
-        }
-
-
-        private void initiailze2()
-        {
-            if (this.ID != 0x71)
-            {
-                throw new Exception("MPU9250 module initialize error");
-            }
-
             this.reset();
 
             this.setSleepEnabled(false);
@@ -153,8 +78,6 @@ namespace Tron.Device.Gyro.MPU9250
             this.setGyroXOffset(zOffset);
 
             this.setAccelFullScaleRange(AccelFullScale.AFS_8G);
-
-
         }
 
 

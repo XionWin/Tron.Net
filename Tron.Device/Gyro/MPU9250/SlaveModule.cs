@@ -70,7 +70,7 @@ namespace Tron.Device.Gyro.MPU9250
 
             this.Read(Register.EXT_SENS_DATA_00, rawData);        // Read the x-, y-, and z-axis calibration values
 
-            this.MagCalibration = new Core.Data.Vector3 (
+            this.MagCalibration = new Core.Data.Vector3(
                 (float)(rawData[0] - 128) / 256.0f + 1.0f,
                 (float)(rawData[1] - 128) / 256.0f + 1.0f,
                 (float)(rawData[2] - 128) / 256.0f + 1.0f
@@ -90,6 +90,18 @@ namespace Tron.Device.Gyro.MPU9250
             this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mfs << 4 | (byte)this.Mmode));        // Set magnetometer data resolution and sample ODR
             this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                     // Enable I2C and transfer 1 byte
             Hardware.Library.Delay(200);
+
+            this.MagBias = new Core.Data.Vector3(
+                164.49942016601562f,
+                452.8156433105469f,
+                -118.00664520263672f
+            );
+            this.MagScale = new Core.Data.Vector3(
+                1.0943952798843384f,
+                0.9661458134651184f,
+                0.9512820243835449f
+            );
+
         }
 
         private void calibrateSlave()
