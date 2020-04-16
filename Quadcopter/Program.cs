@@ -1,5 +1,5 @@
 ﻿// #define ENABLE_LED
-#define ENABLE_BUZZER
+// #define ENABLE_BUZZER
 // #define ENABLE_MOTOR
 
 using System;

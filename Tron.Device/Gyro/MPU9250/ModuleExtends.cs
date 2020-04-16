@@ -342,8 +342,9 @@ namespace Tron.Device.Gyro.MPU9250
             // * 7       | Stops the clock and keeps the timing generator in reset
 
             // bit 2 len 3
+            byte bitStart = 2, len = 3;
             byte mask = 0b_0000_0111;
-            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte(Convert.ToByte(clockSource) & mask));
+            this.WriteByte(Register.PWR_MGMT_1, Convert.ToByte(Convert.ToByte(clockSource) << GETWRITEBIAS(bitStart, len) & mask));
             Hardware.Library.Delay(10);
         }
 
@@ -363,7 +364,8 @@ namespace Tron.Device.Gyro.MPU9250
 
             // bit 2 len 3
             byte mask = 0b_0000_0111;
-            this.WriteByte(Register.CONFIG, Convert.ToByte(Convert.ToByte(mode) & mask));
+            byte bitStart = 2, len = 3;
+            this.WriteByte(Register.CONFIG, Convert.ToByte(Convert.ToByte(mode) << GETWRITEBIAS(bitStart, len) & mask));
             Hardware.Library.Delay(10);
         }
 
@@ -376,7 +378,8 @@ namespace Tron.Device.Gyro.MPU9250
 
             // bit 4 len 2
             byte mask = 0b_0001_1000;
-            this.WriteByte(Register.ACCEL_CONFIG, Convert.ToByte(Convert.ToByte(afs) << 4 & mask));
+            byte bitStart = 4, len = 2;
+            this.WriteByte(Register.ACCEL_CONFIG, Convert.ToByte(Convert.ToByte(afs) << GETWRITEBIAS(bitStart, len) & mask));
             Hardware.Library.Delay(10);
         }
 
@@ -389,7 +392,8 @@ namespace Tron.Device.Gyro.MPU9250
 
             // bit 4 len 2
             byte mask = 0b_0001_1000;
-            this.WriteByte(Register.GYRO_CONFIG, Convert.ToByte(Convert.ToByte(gfs) << 4 & mask));
+            byte bitStart = 4, len = 2;
+            this.WriteByte(Register.GYRO_CONFIG, Convert.ToByte(Convert.ToByte(gfs) << GETWRITEBIAS(bitStart, len) & mask));
             Hardware.Library.Delay(10);
         }
 
@@ -397,33 +401,62 @@ namespace Tron.Device.Gyro.MPU9250
         {
             //bit 6 len 6
             byte mark = 0b_0011_1111;
+            byte bitStart = 6, len = 6;
             var b = this.ReadByte(Register.XG_OFFS_TC);
 
-            return Convert.ToByte(b >> 1 & mark);
+            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
         }
         private void setGyroXOffset(byte offset)
         {
             //bit 6 len 6
-            byte mark = 0b_0111_1110;
-            var b = this.ReadByte(Register.XG_OFFS_TC);
-
-            return Convert.ToByte(b >> 1 & mark);
+            byte mask = 0b_0111_1110;
+            byte bitStart = 6, len = 6;
+            this.WriteByte(Register.XG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
         }
+
         private byte getGyroYOffset()
         {
             //bit 6 len 6
             byte mark = 0b_0011_1111;
+            byte bitStart = 6, len = 6;
             var b = this.ReadByte(Register.YG_OFFS_TC);
 
-            return Convert.ToByte(b >> 1 & mark);
+            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
         }
+        private void setGyroYOffset(byte offset)
+        {
+            //bit 6 len 6
+            byte mask = 0b_0111_1110;
+            byte bitStart = 6, len = 6;
+            this.WriteByte(Register.YG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
+        }
+
         private byte getGyroZOffset()
         {
             //bit 6 len 6
             byte mark = 0b_0011_1111;
+            byte bitStart = 6, len = 6;
             var b = this.ReadByte(Register.ZG_OFFS_TC);
 
-            return Convert.ToByte(b >> 1 & mark);
+            return Convert.ToByte(b >> GETREADBIAS(bitStart, len) & mark);
+        }
+        private void setGyroZOffset(byte offset)
+        {
+            //bit 6 len 6
+            byte mask = 0b_0111_1110;
+            byte bitStart = 6, len = 6;
+            this.WriteByte(Register.ZG_OFFS_TC, Convert.ToByte(Convert.ToByte(offset) << GETWRITEBIAS(bitStart, len) & mask));
+        }
+
+
+        private static int GETWRITEBIAS(byte bitStart, byte len)
+        {
+            return bitStart - len + 1;
+        }
+
+        private static int GETREADBIAS(byte bitStart, byte len)
+        {
+            return bitStart - len;
         }
 
 

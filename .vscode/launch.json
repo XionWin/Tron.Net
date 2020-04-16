@@ -19,7 +19,7 @@
 				"pipeProgram": "ssh",
 				"pipeArgs": [
 					"-T",
-                    "pi@192.168.0.21"
+                    "pi@192.168.137.92"
 				],
 				"debuggerPath": "sudo ~/.vsdbg/vsdbg"
 			}
