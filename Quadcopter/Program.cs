@@ -228,7 +228,7 @@ namespace Quadcopter
             //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
             // }
 
-            deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
+            deltat = (DateTime.Now.Ticks - lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
             lastUpdate = DateTime.Now.Ticks;
             MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
