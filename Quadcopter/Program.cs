@@ -1,9 +1,8 @@
 ﻿#define ENABLE_LED
-// #define ENABLE_BUZZER
-// #define ENABLE_MOTOR
+#define ENABLE_BUZZER
+#define ENABLE_MOTOR
 
 using System;
-using System.Threading;
 
 namespace Quadcopter
 {
@@ -124,7 +123,7 @@ namespace Quadcopter
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 10)
+                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
                     {
                         // System.Console.Write
                         // (
