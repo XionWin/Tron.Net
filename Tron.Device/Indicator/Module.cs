@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace Tron.Device.Indicator
@@ -110,14 +109,16 @@ namespace Tron.Device.Indicator
 
         private BuzzerIndicator _buzzer = BuzzerIndicator.Instance;
 
+        private IndicatorStatus _last_added = IndicatorStatus.NULL;
         public IndicatorStatus Status
         {
             get => this._status_queue.Count > 0 ? this._status_queue.Peek() : IndicatorStatus.NULL;
             set
             {
-                if (this._status_queue.Count < 100 && this._status_queue.LastOrDefault() != value)
+                if (this._status_queue.Count < 100 && _last_added != value)
                 {
                     this._status_queue.Enqueue(value);
+                    this._last_added = value;
                 }
             }
         }

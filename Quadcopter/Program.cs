@@ -101,21 +101,33 @@ namespace Quadcopter
                 while (true)
                 {
                     var start = DateTime.Now;
-                    short target = 20;
-                    for (short i = 0; i < target; i += 1)
-                    {
-#if ENABLE_MOTOR
-                        foreach (var channel in channels)
-                        {
-                            motor.SetValue(channel, i);
-                        }
-#endif
-                        eular = read(gyro);
-                        Tron.Linux.System.Sleep(50);
-                    }
+                    //                     short target = 200;
+                    //                     for (short i = 0; i < target; i += 1)
+                    //                     {
+                    // #if ENABLE_MOTOR
+                    //                         foreach (var channel in channels)
+                    //                         {
+                    //                             motor.SetValue(channel, i);
+                    //                         }
+                    // #endif
+                    //                         eular = read(gyro);
+                    //                         Tron.Linux.System.Sleep(50);
+                    //                     }
 
-                    minCounter = Math.Min(target / (DateTime.Now - start).TotalSeconds, minCounter);
-                    if (minCounter < 2000)
+                    eular = read(gyro);
+                    byte target = (byte)(Math.Abs(eular.Roll) * 10);
+#if ENABLE_MOTOR
+                    foreach (var channel in channels)
+                    {
+                        motor.SetValue(channel, target);
+                    }
+#endif
+                    Tron.Linux.System.Sleep(50);
+
+                    double ticks = (DateTime.Now - start).Ticks;
+                    var count = 1000d / ticks * 10000d;
+                    minCounter = Math.Min(count, minCounter);
+                    if (count < 2000)
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
                     }
@@ -123,7 +135,8 @@ namespace Quadcopter
                     {
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
                     }
-                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
+
+                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 2)
                     {
                         // System.Console.Write
                         // (
@@ -158,23 +171,21 @@ namespace Quadcopter
                         );
 
 
-                        System.Console.WriteLine("Frequency: {0}", minCounter.ToString().PadLeft(4, ' '));
+                        System.Console.WriteLine("Frequency: {0}, Min: {1}", count.ToString().PadLeft(4, ' '), minCounter.ToString().PadLeft(4, ' '));
                         lastUpdate = DateTime.Now;
                         minCounter = double.MaxValue;
                     }
 
-                    for (short i = target; i >= 0; i -= 1)
-                    {
-#if ENABLE_MOTOR
-                        foreach (var channel in channels)
-                        {
-                            motor.SetValue(channel, i);
-                        }
-#endif
-                    }
-#if ENABLE_MOTOR
+                    //                     for (short i = target; i >= 0; i -= 1)
+                    //                     {
+                    // #if ENABLE_MOTOR
+                    //                         foreach (var channel in channels)
+                    //                         {
+                    //                             motor.SetValue(channel, i);
+                    //                         }
+                    // #endif
+                    //                     }
 
-#endif
 
                 }
             }
@@ -227,8 +238,8 @@ namespace Quadcopter
             //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
             // }
 
-            deltat = (DateTime.Now.Ticks - lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
-            lastUpdate = DateTime.Now.Ticks;
+            deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+            _lastUpdate = DateTime.Now.Ticks;
             MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
 
@@ -253,7 +264,7 @@ namespace Quadcopter
         private const double GyroMeasError = Math.PI * (60.0 / 180.0);
         private static readonly double beta = Math.Sqrt(3.0 / 4.0) * GyroMeasError;
         private static double deltat = 0;
-        private static double lastUpdate = 0;
+        private static double _lastUpdate = 0;
         private static void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz)
         {
             double q1 = q.Q1, q2 = q.Q2, q3 = q.Q3, q4 = q.Q4;
