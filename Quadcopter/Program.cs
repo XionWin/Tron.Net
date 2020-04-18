@@ -94,9 +94,9 @@ namespace Quadcopter
                 Tron.Hardware.Library.Delay(1000);
 
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
-
                 DateTime lastUpdate = DateTime.Now;
-                double minCounter = double.MaxValue;
+                double min_sigle_counter = double.MaxValue;
+                double total_counter = 0;
                 Tron.Core.Data.EularAngles eular = new Tron.Core.Data.EularAngles();
                 while (true)
                 {
@@ -123,20 +123,12 @@ namespace Quadcopter
                     }
 #endif
                     Tron.Linux.System.Sleep(50);
+                    total_counter++;
 
-                    double ticks = (DateTime.Now - start).Ticks;
-                    var count = 1000d / ticks * 10000d;
-                    minCounter = Math.Min(count, minCounter);
-                    if (count < 2000)
-                    {
-                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
-                    }
-                    else
-                    {
-                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
-                    }
+                    
+                    min_sigle_counter = Math.Min(1000d / (DateTime.Now - start).Ticks * 10000d, min_sigle_counter);
 
-                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 2)
+                    if ((DateTime.Now - lastUpdate).TotalMilliseconds > 1000)
                     {
                         // System.Console.Write
                         // (
@@ -171,9 +163,21 @@ namespace Quadcopter
                         );
 
 
-                        System.Console.WriteLine("Frequency: {0}, Min: {1}", count.ToString().PadLeft(4, ' '), minCounter.ToString().PadLeft(4, ' '));
+                        var count = total_counter / (DateTime.Now - lastUpdate).TotalSeconds;
+                        if (count < 2000 || min_sigle_counter < 700)
+                        {
+                            indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
+                        }
+                        else
+                        {
+                            indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
+                        }
+
+
+                        System.Console.WriteLine("Frequency: {0}, Min: {1}", count.ToString().PadLeft(4, ' '), min_sigle_counter.ToString().PadLeft(4, ' '));
                         lastUpdate = DateTime.Now;
-                        minCounter = double.MaxValue;
+                        min_sigle_counter = double.MaxValue;
+                        count = 0;
                     }
 
                     //                     for (short i = target; i >= 0; i -= 1)

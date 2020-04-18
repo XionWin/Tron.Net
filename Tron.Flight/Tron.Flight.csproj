@@ -6,5 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Tron.Core\Tron.Core.csproj" />
+    <ProjectReference Include="..\Tron.Device\Tron.Device.csproj" />
   </ItemGroup>
 </Project>
