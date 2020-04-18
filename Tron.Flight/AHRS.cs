@@ -4,6 +4,19 @@ namespace Tron.Flight
 {
     public class AHRS
     {
+        private Tron.Device.Gyro.MPU9250.Module _gyro;
+        public AHRS(Tron.Device.Gyro.MPU9250.Module gyro, Action<AHRS> onReadCallback)
+        {
+            this._gyro = gyro;
+
+            while (true)
+            {
+                this.EularAngles = this.read();
+                onReadCallback(this);
+            }
+        }
+
+
         public Tron.Core.Data.Vector3 Accel
         {
             get;
@@ -25,30 +38,31 @@ namespace Tron.Flight
         {
             get;
             private set;
-        }
+        } = new Tron.Core.Data.Quaternion(1, 0, 0, 0);
+
         public Core.Data.EularAngles EularAngles
         {
             get;
             private set;
         }
 
-        private Tron.Core.Data.EularAngles read(Tron.Device.Gyro.MPU9250.Module gyro)
+        private Tron.Core.Data.EularAngles read()
         {
-            var a = gyro.Accel;
-            var g = gyro.Gyro;
-            var m = gyro.Mag;
+            var a = _gyro.Accel;
+            var g = _gyro.Gyro;
+            var m = _gyro.Mag;
 
-            var ax = a.X * gyro.Ares - gyro.AccBias.X;
-            var ay = a.Y * gyro.Ares - gyro.AccBias.Y;
-            var az = a.Z * gyro.Ares - gyro.AccBias.Z;
+            var ax = a.X * _gyro.Ares - _gyro.AccBias.X;
+            var ay = a.Y * _gyro.Ares - _gyro.AccBias.Y;
+            var az = a.Z * _gyro.Ares - _gyro.AccBias.Z;
 
-            var gx = g.X * gyro.Gres;
-            var gy = g.Y * gyro.Gres;
-            var gz = g.Z * gyro.Gres;
+            var gx = g.X * _gyro.Gres;
+            var gy = g.Y * _gyro.Gres;
+            var gz = g.Z * _gyro.Gres;
 
-            var mx = (m.X * gyro.Mres * gyro.MagCalibration.X - gyro.MagBias.X) * gyro.MagScale.X;
-            var my = (m.Y * gyro.Mres * gyro.MagCalibration.Y - gyro.MagBias.Y) * gyro.MagScale.Y;
-            var mz = (m.Z * gyro.Mres * gyro.MagCalibration.Z - gyro.MagBias.Z) * gyro.MagScale.Z;
+            var mx = (m.X * _gyro.Mres * _gyro.MagCalibration.X - _gyro.MagBias.X) * _gyro.MagScale.X;
+            var my = (m.Y * _gyro.Mres * _gyro.MagCalibration.Y - _gyro.MagBias.Y) * _gyro.MagScale.Y;
+            var mz = (m.Z * _gyro.Mres * _gyro.MagCalibration.Z - _gyro.MagBias.Z) * _gyro.MagScale.Z;
 
             this.Accel = new Tron.Core.Data.Vector3(
                 ax,
@@ -79,11 +93,11 @@ namespace Tron.Flight
             MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
 
-            var a12 = 2.0f * (q.Q2 * q.Q3 + q.Q1 * q.Q4);
-            var a22 = q.Q1 * q.Q1 + q.Q2 * q.Q2 - q.Q3 * q.Q3 - q.Q4 * q.Q4;
-            var a31 = 2.0f * (q.Q1 * q.Q2 + q.Q3 * q.Q4);
-            var a32 = 2.0f * (q.Q2 * q.Q4 - q.Q1 * q.Q3);
-            var a33 = q.Q1 * q.Q1 - q.Q2 * q.Q2 - q.Q3 * q.Q3 + q.Q4 * q.Q4;
+            var a12 = 2.0f * (Quaternion.Q2 * Quaternion.Q3 + Quaternion.Q1 * Quaternion.Q4);
+            var a22 = Quaternion.Q1 * Quaternion.Q1 + Quaternion.Q2 * Quaternion.Q2 - Quaternion.Q3 * Quaternion.Q3 - Quaternion.Q4 * Quaternion.Q4;
+            var a31 = 2.0f * (Quaternion.Q1 * Quaternion.Q2 + Quaternion.Q3 * Quaternion.Q4);
+            var a32 = 2.0f * (Quaternion.Q2 * Quaternion.Q4 - Quaternion.Q1 * Quaternion.Q3);
+            var a33 = Quaternion.Q1 * Quaternion.Q1 - Quaternion.Q2 * Quaternion.Q2 - Quaternion.Q3 * Quaternion.Q3 + Quaternion.Q4 * Quaternion.Q4;
             var pitch = -Math.Asin(a32);
             var roll = Math.Atan2(a31, a33);
             var yaw = Math.Atan2(a12, a22);
@@ -96,14 +110,13 @@ namespace Tron.Flight
             return new Tron.Core.Data.EularAngles(pitch, roll, yaw);
         }
 
-        private static Tron.Core.Data.Quaternion q = new Tron.Core.Data.Quaternion(1, 0, 0, 0);
         private const double GyroMeasError = Math.PI * (60.0 / 180.0);
         private static readonly double beta = Math.Sqrt(3.0 / 4.0) * GyroMeasError;
-        private static double deltat = 0;
-        private static double _lastUpdate = 0;
-        private static void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz)
+        private double deltat = 0;
+        private double _lastUpdate = 0;
+        private void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz)
         {
-            double q1 = q.Q1, q2 = q.Q2, q3 = q.Q3, q4 = q.Q4;
+            double q1 = Quaternion.Q1, q2 = Quaternion.Q2, q3 = Quaternion.Q3, q4 = Quaternion.Q4;
             double norm;
             double hx, hy, _2bx, _2bz;
             double s1, s2, s3, s4;
@@ -202,10 +215,13 @@ namespace Tron.Flight
             q4 += qDot4 * deltat;
             norm = Math.Sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
             norm = 1.0f / norm;
-            q.Q1 = q1 * norm;
-            q.Q2 = q2 * norm;
-            q.Q3 = q3 * norm;
-            q.Q4 = q4 * norm;
+
+            this.Quaternion = new Core.Data.Quaternion(
+                q1 * norm,
+                q2 * norm,
+                q3 * norm,
+                q4 * norm
+            );
         }
     }
 }
