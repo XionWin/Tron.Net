@@ -93,14 +93,20 @@ namespace Quadcopter
 
 
                 ushort thrust = 0;
+                double angle = 0d;
+                bool reset_angle = false;
                 var udp = new Tron.Net.UdpClient(
                     (data) =>
                     {
-                        if(data.Length == 1)
+                        if (data.Length == 1 & data[0] == 0xFF)
                         {
                             motor.Enable = false;
                         }
-                        else if(data.Length == 2)
+                        if (data.Length == 1 & data[0] == 0xFE)
+                        {
+                            reset_angle = true;
+                        }
+                        else if (data.Length == 2)
                         {
                             thrust = Convert.ToUInt16((double)((data[0] << 8) + data[1]) / 32767 * 200);
                         }
@@ -142,7 +148,12 @@ namespace Quadcopter
 
                     var pitch = yPIDCtrl.Manipulate(0, latestPitch, td);
                     var roll = xPIDCtrl.Manipulate(0, latestRoll, td);
-                    var yaw = zPIDCtrl.Manipulate(0.22353684637575155, latestYaw, td);
+                    if (reset_angle)
+                    {
+                        angle = latestYaw;
+                        reset_angle = false;
+                    }
+                    var yaw = zPIDCtrl.Manipulate(angle, latestYaw, td);
 
                     double frontLeftSpeed = thrust *
                         (pitch > 0d ? 1d : 1d - -pitch) *
@@ -184,14 +195,14 @@ namespace Quadcopter
 #endif
 
                     Tron.Linux.System.Sleep(50);
-                    
-                    sendData[0] = Convert.ToByte(ahrs.EularAngles.Pitch < 0 ? 0x01: 0x00);
+
+                    sendData[0] = Convert.ToByte(ahrs.EularAngles.Pitch < 0 ? 0x01 : 0x00);
                     sendData[1] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Pitch) >> 8);
                     sendData[2] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Pitch));
-                    sendData[3] = Convert.ToByte(ahrs.EularAngles.Roll < 0 ? 0x01: 0x00);
+                    sendData[3] = Convert.ToByte(ahrs.EularAngles.Roll < 0 ? 0x01 : 0x00);
                     sendData[4] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Roll) >> 8);
                     sendData[5] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Roll));
-                    sendData[6] = Convert.ToByte(ahrs.EularAngles.Yaw < 0 ? 0x01: 0x00);
+                    sendData[6] = Convert.ToByte(ahrs.EularAngles.Yaw < 0 ? 0x01 : 0x00);
                     sendData[7] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Yaw) >> 8);
                     sendData[8] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Yaw));
                     udp.Send(sendData);

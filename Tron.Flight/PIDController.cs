@@ -7,7 +7,7 @@ namespace Tron.Flight
         private double _kp;
         private double _ki;
         private double _kd;
-        private readonly double _maxErrorCumulative = double.MaxValue;
+        private readonly double _maxErrorCumulative = 0;
         private double _previousErrorCumulative = 0d;
         private double _previousError = 0d;
 
