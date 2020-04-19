@@ -1,6 +1,6 @@
 ﻿#define ENABLE_LED
-#define ENABLE_BUZZER
-// #define ENABLE_MOTOR
+// #define ENABLE_BUZZER
+#define ENABLE_MOTOR
 
 using System;
 
@@ -8,6 +8,9 @@ namespace Quadcopter
 {
     class Program
     {
+        public const double KP = 2.5d;
+        public const double KI = 0.5d;
+        public const double KD = 0d;
         static void Main(string[] args)
         {
             Tron.Linux.System.SetRealtime();
@@ -88,6 +91,24 @@ namespace Quadcopter
 #endif
 
 
+
+                ushort thrust = 0;
+                var udp = new Tron.Net.UdpClient(
+                    (data) =>
+                    {
+                        if(data.Length == 1)
+                        {
+                            motor.Enable = false;
+                        }
+                        else if(data.Length == 2)
+                        {
+                            thrust = Convert.ToUInt16((double)((data[0] << 8) + data[1]) / 32767 * 200);
+                        }
+                    }
+                );
+
+                udp.Connect(new System.Net.IPEndPoint(System.Net.IPAddress.Parse("192.168.0.15"), 8815));
+
                 indicator.Status = Tron.Device.Indicator.IndicatorStatus.STANDBY;
                 Tron.Hardware.Library.Delay(1000);
 
@@ -96,108 +117,98 @@ namespace Quadcopter
 
 
 
-                DateTime lastUpdate = DateTime.Now;
-                long min_sigle_counter = long.MaxValue;
-                double total_counter = 0;
-                Tron.Core.Data.EularAngles eular = new Tron.Core.Data.EularAngles();
-                
+                var start_delay = new TimeSpan(0, 0, 10);
+                var start = DateTime.Now;
+
+                var xPIDCtrl = new Tron.Flight.PIDController(KP, KI, KD);
+                var yPIDCtrl = new Tron.Flight.PIDController(KP, KI, KD);
+                var zPIDCtrl = new Tron.Flight.PIDController(KP, KI, KD);
+
+                double yawMemory = -1;
+
+                byte[] sendData = new byte[9];
                 new Tron.Flight.AHRS(gyro, (ahrs) =>
                 {
-
-                   var start = DateTime.Now;
-                   //                     short target = 200;
-                   //                     for (short i = 0; i < target; i += 1)
-                   //                     {
-                   // #if ENABLE_MOTOR
-                   //                         foreach (var channel in channels)
-                   //                         {
-                   //                             motor.SetValue(channel, i);
-                   //                         }
-                   // #endif
-                   //                         eular = read(gyro);
-                   //                         Tron.Linux.System.Sleep(50);
-                   //                     }
-
-                   eular = ahrs.EularAngles;
-                   byte target = (byte)(Math.Abs(eular.Roll) * 10);
-#if ENABLE_MOTOR
-                    foreach (var channel in channels)
+                    if (yawMemory < 0)
                     {
-                        motor.SetValue(channel, target);
+                        yawMemory = ahrs.EularAngles.Yaw;
                     }
+
+                    var td = (DateTime.Now - start).TotalSeconds;
+
+                    var latestPitch = Math.Min(Math.Max(ahrs.EularAngles.Pitch / 360d, -1d), 1d);
+                    var latestRoll = Math.Min(Math.Max(ahrs.EularAngles.Roll / 360d, -1d), 1d);
+                    var latestYaw = Math.Min(Math.Max(ahrs.EularAngles.Yaw / 360d, -1d), 1d);
+
+                    var pitch = yPIDCtrl.Manipulate(0, latestPitch, td);
+                    var roll = xPIDCtrl.Manipulate(0, latestRoll, td);
+                    var yaw = zPIDCtrl.Manipulate(0.22353684637575155, latestYaw, td);
+
+                    double frontLeftSpeed = thrust *
+                        (pitch > 0d ? 1d : 1d - -pitch) *
+                        (roll < 0d ? 1d : 1d - roll) *
+                        (yaw > 0d ? 1d : 1d - -yaw);
+
+                    double frontRightSpeed = thrust *
+                        (pitch > 0d ? 1d : 1d - -pitch) *
+                        (roll > 0d ? 1d : 1d - -roll) *
+                        (yaw < 0d ? 1d : 1d - yaw);
+
+                    double rearRightSpeed = thrust *
+                        (pitch < 0d ? 1d : 1d - pitch) *
+                        (roll > 0d ? 1d : 1d - -roll) *
+                        (yaw > 0d ? 1d : 1d - -yaw);
+
+                    double rearLeftSpeed = thrust *
+                        (pitch < 0d ? 1d : 1d - pitch) *
+                        (roll < 0d ? 1d : 1d - roll) *
+                        (yaw < 0d ? 1d : 1d - yaw);
+
+
+#if ENABLE_MOTOR
+
+                    frontLeftSpeed = (short)Math.Min((ushort)frontLeftSpeed, thrust);
+                    frontRightSpeed = (short)Math.Min((ushort)frontRightSpeed, thrust);
+                    rearRightSpeed = (short)Math.Min((ushort)rearRightSpeed, thrust);
+                    rearLeftSpeed = (short)Math.Min((ushort)rearLeftSpeed, thrust);
+
+
+                    System.Console.Write(ahrs.EularAngles);
+                    System.Console.WriteLine("\t {0} {1} {2} {3}", frontLeftSpeed, frontRightSpeed, rearRightSpeed, rearLeftSpeed);
+
+                    motor.SetValue(channels[0], (short)Math.Min((ushort)frontLeftSpeed, thrust));
+                    motor.SetValue(channels[1], (short)Math.Min((ushort)frontRightSpeed, thrust));
+                    motor.SetValue(channels[2], (short)Math.Min((ushort)rearRightSpeed, thrust));
+                    motor.SetValue(channels[3], (short)Math.Min((ushort)rearLeftSpeed, thrust));
+
 #endif
-                   Tron.Linux.System.Sleep(50);
-                   total_counter++;
 
-                   min_sigle_counter = Math.Min(1000 * 10000 / (DateTime.Now - start).Ticks, min_sigle_counter);
+                    Tron.Linux.System.Sleep(50);
+                    
+                    sendData[0] = Convert.ToByte(ahrs.EularAngles.Pitch < 0 ? 0x01: 0x00);
+                    sendData[1] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Pitch) >> 8);
+                    sendData[2] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Pitch));
+                    sendData[3] = Convert.ToByte(ahrs.EularAngles.Roll < 0 ? 0x01: 0x00);
+                    sendData[4] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Roll) >> 8);
+                    sendData[5] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Roll));
+                    sendData[6] = Convert.ToByte(ahrs.EularAngles.Yaw < 0 ? 0x01: 0x00);
+                    sendData[7] = Convert.ToByte((ushort)Math.Abs(ahrs.EularAngles.Yaw) >> 8);
+                    sendData[8] = Convert.ToByte((byte)Math.Abs(ahrs.EularAngles.Yaw));
+                    udp.Send(sendData);
 
-                   if ((DateTime.Now - lastUpdate).TotalMilliseconds > 20)
-                   {
-                       // System.Console.Write
-                       // (
-                       //     "ax: {0} ay: {1} az: {2}\t",
-                       //     _Accel.X.ToString("N2").PadLeft(8, ' '),
-                       //     _Accel.Y.ToString("N2").PadLeft(8, ' '),
-                       //     _Accel.Z.ToString("N2").PadLeft(8, ' ')
-                       // );
-
-                       // System.Console.Write
-                       // (
-                       //     "gx: {0} gy: {1} gz: {2}\t",
-                       //     _Gyro.X.ToString("N2").PadLeft(8, ' '),
-                       //     _Gyro.Y.ToString("N2").PadLeft(8, ' '),
-                       //     _Gyro.Z.ToString("N2").PadLeft(8, ' ')
-                       // );
-
-                       // System.Console.Write
-                       // (
-                       //     "mx: {0} my: {1} mz: {2}\t",
-                       //     _Mag.X.ToString("N2").PadLeft(8, ' '),
-                       //     _Mag.Y.ToString("N2").PadLeft(8, ' '),
-                       //     _Mag.Z.ToString("N2").PadLeft(8, ' ')
-                       // );
-
-                       System.Console.Write
-                       (
-                           "PITCH: {0} ROLL: {1} YAW: {2}\t",
-                           eular.Pitch.ToString("N2").PadLeft(7, ' '),
-                           eular.Roll.ToString("N2").PadLeft(7, ' '),
-                           eular.Yaw.ToString("N2").PadLeft(7, ' ')
-                       );
-
-
-                       var count = total_counter / (DateTime.Now - lastUpdate).TotalSeconds;
-                       if (count < 2000 || min_sigle_counter < 500)
-                       {
-                           indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
-                       }
-                       else
-                       {
-                           indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
-                       }
-
-
-                       System.Console.WriteLine("Frequency: {0}, Min: {1}", count.ToString().PadLeft(4, ' '), min_sigle_counter.ToString().PadLeft(4, ' '));
-                       lastUpdate = DateTime.Now;
-                       min_sigle_counter = long.MaxValue;
-                       total_counter = 0;
-                   }
-
-                   //                     for (short i = target; i >= 0; i -= 1)
-                   //                     {
-                   // #if ENABLE_MOTOR
-                   //                         foreach (var channel in channels)
-                   //                         {
-                   //                             motor.SetValue(channel, i);
-                   //                         }
-                   // #endif
-                   //                     }
-
-
-
-
-
-               });
+                    var ticks = (DateTime.Now - start).Ticks;
+                    var counter = 1000d * 10000d / ticks;
+                    if (counter < 750)
+                    {
+                        System.Console.WriteLine(counter);
+                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
+                    }
+                    else
+                    {
+                        indicator.Status = Tron.Device.Indicator.IndicatorStatus.RUNING;
+                    }
+                    start = DateTime.Now;
+                });
 
             }
         }

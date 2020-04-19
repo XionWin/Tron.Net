@@ -5,7 +5,7 @@ namespace Tron.Device.MotorControl.PCA9685
 {
     public class Module : Hardware.I2CDevice<Register>
     {
-        private const Hardware.GPIOPins PIN_EN = Hardware.GPIOPins.GPIO_04;
+        private const Hardware.GPIOPins PIN_EN = Hardware.GPIOPins.GPIO_18;
         private const int CLOCK_FREQ = 25000000;     //25MHz default osc clock
 
         private const int PWM_SCALE = 4095;

@@ -103,7 +103,8 @@ namespace Tron.Flight
             var yaw = Math.Atan2(a12, a22);
             pitch *= 180.0f / Math.PI;
             yaw *= 180.0f / Math.PI;
-            yaw += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+            // yaw += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+            yaw += 3.89f;
             if (yaw < 0) yaw += 360.0f; // Ensure yaw stays between 0 and 360
             roll *= 180.0f / Math.PI;
 

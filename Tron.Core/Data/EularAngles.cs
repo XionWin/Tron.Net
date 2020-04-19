@@ -26,5 +26,10 @@ namespace Tron.Core.Data
             get;
             private set;
         }
+
+        public override string ToString()
+        {
+            return string.Format("Pitch: {0} Roll: {1} Yaw: {2}", this.Pitch, this.Roll, this.Yaw);
+        }
     }
 }
