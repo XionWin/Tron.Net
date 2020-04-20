@@ -59,7 +59,7 @@ namespace Tron.Device.MotorControl.PCA9685
 
         public void SetValue(Channel channel, short value)
         {
-            if (value <= 1000)
+            if (value >= 0 && value <= 800)
             {
                 var v = value == 0 ? PWM_STATIC_LOW :
                 (short)(PWM_DYNAMIC_LOW + ((PWM_HIGH - PWM_DYNAMIC_LOW) / 1000 * (value - 1)));

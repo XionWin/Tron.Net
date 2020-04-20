@@ -8,8 +8,8 @@ namespace Quadcopter
 {
     class Program
     {
-        public const double KP = 2.5d;
-        public const double KI = 0.5d;
+        public const double KP = 4d;
+        public const double KI = 3d;
         public const double KD = 0d;
         static void Main(string[] args)
         {
@@ -81,10 +81,10 @@ namespace Quadcopter
 #if ENABLE_MOTOR
                 var channels = new Tron.Device.MotorControl.PCA9685.Channel[]
                 {
-                    Tron.Device.MotorControl.PCA9685.Channel.Channel0,
                     Tron.Device.MotorControl.PCA9685.Channel.Channel1,
                     Tron.Device.MotorControl.PCA9685.Channel.Channel2,
                     Tron.Device.MotorControl.PCA9685.Channel.Channel3,
+                    Tron.Device.MotorControl.PCA9685.Channel.Channel0,
                 };
                 var motor = new Tron.Device.MotorControl.PCA9685.Module(channels);
                 motor.Enable = true;
@@ -100,7 +100,9 @@ namespace Quadcopter
                     {
                         if (data.Length == 1 & data[0] == 0xFF)
                         {
+#if ENABLE_MOTOR
                             motor.Enable = false;
+#endif
                         }
                         if (data.Length == 1 & data[0] == 0xFE)
                         {
@@ -108,7 +110,7 @@ namespace Quadcopter
                         }
                         else if (data.Length == 2)
                         {
-                            thrust = Convert.ToUInt16((double)((data[0] << 8) + data[1]) / 32767 * 200);
+                            thrust = Convert.ToUInt16((double)((data[0] << 8) + data[1]) / 32767 * 800);
                         }
                     }
                 );
@@ -151,32 +153,35 @@ namespace Quadcopter
                     if (reset_angle)
                     {
                         angle = latestYaw;
-                        reset_angle = false;
+                        // reset_angle = false;
                     }
                     var yaw = zPIDCtrl.Manipulate(angle, latestYaw, td);
 
+
+                    if (reset_angle)
+                    {
+                        yaw = 0;
+                    }
+
                     double frontLeftSpeed = thrust *
                         (pitch > 0d ? 1d : 1d - -pitch) *
-                        (roll < 0d ? 1d : 1d - roll) *
+                        (roll > 0d ? 1d : 1d - -roll) *
                         (yaw > 0d ? 1d : 1d - -yaw);
 
                     double frontRightSpeed = thrust *
                         (pitch > 0d ? 1d : 1d - -pitch) *
-                        (roll > 0d ? 1d : 1d - -roll) *
+                        (roll < 0d ? 1d : 1d - roll) *
                         (yaw < 0d ? 1d : 1d - yaw);
 
                     double rearRightSpeed = thrust *
                         (pitch < 0d ? 1d : 1d - pitch) *
-                        (roll > 0d ? 1d : 1d - -roll) *
+                        (roll < 0d ? 1d : 1d - roll) *
                         (yaw > 0d ? 1d : 1d - -yaw);
 
                     double rearLeftSpeed = thrust *
                         (pitch < 0d ? 1d : 1d - pitch) *
-                        (roll < 0d ? 1d : 1d - roll) *
+                        (roll > 0d ? 1d : 1d - -roll) *
                         (yaw < 0d ? 1d : 1d - yaw);
-
-
-#if ENABLE_MOTOR
 
                     frontLeftSpeed = (short)Math.Min((ushort)frontLeftSpeed, thrust);
                     frontRightSpeed = (short)Math.Min((ushort)frontRightSpeed, thrust);
@@ -184,14 +189,23 @@ namespace Quadcopter
                     rearLeftSpeed = (short)Math.Min((ushort)rearLeftSpeed, thrust);
 
 
-                    System.Console.Write(ahrs.EularAngles);
-                    System.Console.WriteLine("\t {0} {1} {2} {3}", frontLeftSpeed, frontRightSpeed, rearRightSpeed, rearLeftSpeed);
+                    // System.Console.Write(ahrs.EularAngles);
+                    // System.Console.WriteLine
+                    // (
+                    //     "\t {0} {1} {2} {3}",
+                    //     frontLeftSpeed.ToString().PadLeft(4),
+                    //     frontRightSpeed.ToString().PadLeft(4),
+                    //     rearRightSpeed.ToString().PadLeft(4),
+                    //     rearLeftSpeed.ToString().PadLeft(4)
+                    // );
+
+
+#if ENABLE_MOTOR
 
                     motor.SetValue(channels[0], (short)Math.Min((ushort)frontLeftSpeed, thrust));
                     motor.SetValue(channels[1], (short)Math.Min((ushort)frontRightSpeed, thrust));
                     motor.SetValue(channels[2], (short)Math.Min((ushort)rearRightSpeed, thrust));
                     motor.SetValue(channels[3], (short)Math.Min((ushort)rearLeftSpeed, thrust));
-
 #endif
 
                     Tron.Linux.System.Sleep(50);
@@ -209,7 +223,7 @@ namespace Quadcopter
 
                     var ticks = (DateTime.Now - start).Ticks;
                     var counter = 1000d * 10000d / ticks;
-                    if (counter < 750)
+                    if (counter < 650)
                     {
                         System.Console.WriteLine(counter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;

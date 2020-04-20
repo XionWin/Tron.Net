@@ -78,6 +78,7 @@ namespace Tron.Device.Gyro.MPU9250
             this.setGyroXOffset(zOffset);
 
             this.setAccelFullScaleRange(AccelFullScale.AFS_8G);
+
         }
 
 

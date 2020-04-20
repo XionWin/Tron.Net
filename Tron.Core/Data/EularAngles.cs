@@ -4,10 +4,10 @@ namespace Tron.Core.Data
 {
     public struct EularAngles
     {
-        public EularAngles(double roll, double pitch, double yaw)
+        public EularAngles(double pitch, double roll, double yaw)
         {
-            this.Roll = roll;
             this.Pitch = pitch;
+            this.Roll = roll;
             this.Yaw = yaw;
         }
 
@@ -29,7 +29,13 @@ namespace Tron.Core.Data
 
         public override string ToString()
         {
-            return string.Format("Pitch: {0} Roll: {1} Yaw: {2}", this.Pitch, this.Roll, this.Yaw);
+            return string.Format
+            (
+                "Pitch: {0} Roll: {1} Yaw: {2}",
+                this.Pitch.ToString("N2").PadLeft(5),
+                this.Roll.ToString("N2").PadLeft(5),
+                this.Yaw.ToString("N2").PadLeft(5)
+            );
         }
     }
 }
