@@ -32,7 +32,7 @@ namespace Tron.Flight
             double outputDerivativeGain = this._kd * futureError;
             _previousError = error;
 
-            return outputProportionalGain + outputIntegralGain + outputDerivativeGain;
+            return Math.Max(Math.Min(outputProportionalGain + outputIntegralGain + outputDerivativeGain, 1), -1);
         }
     }
 }

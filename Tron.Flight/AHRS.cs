@@ -80,17 +80,17 @@ namespace Tron.Flight
                 mz
             );
 
-            // for (int i = 0; i < 10; i++)
-            // {
-            //     deltat = (DateTime.Now.Ticks - lastUpdate) / 1000000.0f; // set integration time by time elapsed since last filter update
-            //     lastUpdate = DateTime.Now.Ticks;
+            for (int i = 0; i < 10; i++)
+            {
+                deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+                _lastUpdate = DateTime.Now.Ticks;
 
-            //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
-            // }
+                MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            }
 
-            deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
-            _lastUpdate = DateTime.Now.Ticks;
-            MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            // deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+            // _lastUpdate = DateTime.Now.Ticks;
+            // MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
 
             var a12 = 2.0f * (Quaternion.Q2 * Quaternion.Q3 + Quaternion.Q1 * Quaternion.Q4);

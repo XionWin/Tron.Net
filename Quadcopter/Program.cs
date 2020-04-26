@@ -8,9 +8,9 @@ namespace Quadcopter
 {
     class Program
     {
-        public const double KP = 4d;
-        public const double KI = 3d;
-        public const double KD = 0d;
+        public const double KP = 2.2d;
+        public const double KI = 2d;
+        public const double KD = 0.2d;
         static void Main(string[] args)
         {
             Tron.Linux.System.SetRealtime();
@@ -148,6 +148,9 @@ namespace Quadcopter
                     var latestRoll = Math.Min(Math.Max(ahrs.EularAngles.Roll / 360d, -1d), 1d);
                     var latestYaw = Math.Min(Math.Max(ahrs.EularAngles.Yaw / 360d, -1d), 1d);
 
+                    latestYaw = latestYaw > 0.5 ? 1 - latestYaw : latestYaw;
+                    latestYaw = -latestYaw;
+
                     var pitch = yPIDCtrl.Manipulate(0, latestPitch, td);
                     var roll = xPIDCtrl.Manipulate(0, latestRoll, td);
                     if (reset_angle)
@@ -163,22 +166,24 @@ namespace Quadcopter
                         yaw = 0;
                     }
 
-                    double frontLeftSpeed = thrust *
+                    var thrust_real = thrust;
+
+                    double frontLeftSpeed = thrust_real *
                         (pitch > 0d ? 1d : 1d - -pitch) *
                         (roll > 0d ? 1d : 1d - -roll) *
                         (yaw > 0d ? 1d : 1d - -yaw);
 
-                    double frontRightSpeed = thrust *
+                    double frontRightSpeed = thrust_real *
                         (pitch > 0d ? 1d : 1d - -pitch) *
                         (roll < 0d ? 1d : 1d - roll) *
                         (yaw < 0d ? 1d : 1d - yaw);
 
-                    double rearRightSpeed = thrust *
+                    double rearRightSpeed = thrust_real *
                         (pitch < 0d ? 1d : 1d - pitch) *
                         (roll < 0d ? 1d : 1d - roll) *
                         (yaw > 0d ? 1d : 1d - -yaw);
 
-                    double rearLeftSpeed = thrust *
+                    double rearLeftSpeed = thrust_real *
                         (pitch < 0d ? 1d : 1d - pitch) *
                         (roll > 0d ? 1d : 1d - -roll) *
                         (yaw < 0d ? 1d : 1d - yaw);
@@ -190,14 +195,14 @@ namespace Quadcopter
 
 
                     // System.Console.Write(ahrs.EularAngles);
-                    // System.Console.WriteLine
-                    // (
-                    //     "\t {0} {1} {2} {3}",
-                    //     frontLeftSpeed.ToString().PadLeft(4),
-                    //     frontRightSpeed.ToString().PadLeft(4),
-                    //     rearRightSpeed.ToString().PadLeft(4),
-                    //     rearLeftSpeed.ToString().PadLeft(4)
-                    // );
+                    System.Console.WriteLine
+                    (
+                        "\t {0} {1} {2} {3}",
+                        frontLeftSpeed.ToString().PadLeft(4),
+                        frontRightSpeed.ToString().PadLeft(4),
+                        rearRightSpeed.ToString().PadLeft(4),
+                        rearLeftSpeed.ToString().PadLeft(4)
+                    );
 
 
 #if ENABLE_MOTOR
