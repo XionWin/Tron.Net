@@ -80,17 +80,17 @@ namespace Tron.Flight
                 mz
             );
 
-            for (int i = 0; i < 10; i++)
-            {
-                deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
-                _lastUpdate = DateTime.Now.Ticks;
+            // for (int i = 0; i < 10; i++)
+            // {
+            //     deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+            //     _lastUpdate = DateTime.Now.Ticks;
 
-                MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
-            }
+            //     MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            // }
 
-            // deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
-            // _lastUpdate = DateTime.Now.Ticks;
-            // MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
+            deltat = (DateTime.Now.Ticks - _lastUpdate) / 10000000.0f; // set integration time by time elapsed since last filter update
+            _lastUpdate = DateTime.Now.Ticks;
+            MadgwickQuaternionUpdate(-ax, +ay, +az, gx * Math.PI / 180.0f, -gy * Math.PI / 180.0f, -gz * Math.PI / 180.0f, my, -mx, mz);
 
 
             var a12 = 2.0f * (Quaternion.Q2 * Quaternion.Q3 + Quaternion.Q1 * Quaternion.Q4);
@@ -104,7 +104,7 @@ namespace Tron.Flight
             pitch *= 180.0f / Math.PI;
             yaw *= 180.0f / Math.PI;
             // yaw += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-            yaw += 3.89f;
+            // yaw += 3.89f;
             if (yaw < 0) yaw += 360.0f; // Ensure yaw stays between 0 and 360
             roll *= 180.0f / Math.PI;
 

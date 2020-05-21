@@ -19,7 +19,7 @@
 				"pipeProgram": "ssh",
 				"pipeArgs": [
 					"-T",
-                    "pi@drone"
+                    "pi@cube"
 				],
 				"debuggerPath": "sudo ~/.vsdbg/vsdbg"
 			}

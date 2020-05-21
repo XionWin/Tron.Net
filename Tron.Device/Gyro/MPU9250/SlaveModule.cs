@@ -77,18 +77,18 @@ namespace Tron.Device.Gyro.MPU9250
             );
 
             this.WriteByte(Register.I2C_SLV0_ADDR, (byte)Register.AK8963_MODULE_ADDRESS);           // Set the I2C slave address of AK8963 and set for write.
-            this.WriteByte(Register.I2C_SLV0_REG, (byte)Register.AK8963_CNTL);               // I2C slave 0 register address from where to begin data transfer
-            this.WriteByte(Register.I2C_SLV0_DO, 0x00);                       // Power down magnetometer  
-            this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                     // Enable I2C and transfer 1 byte
+            this.WriteByte(Register.I2C_SLV0_REG, (byte)Register.AK8963_CNTL);                      // I2C slave 0 register address from where to begin data transfer
+            this.WriteByte(Register.I2C_SLV0_DO, 0x00);                                             // Power down magnetometer  
+            this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                                           // Enable I2C and transfer 1 byte
             Hardware.Library.Delay(50);
 
             this.WriteByte(Register.I2C_SLV0_ADDR, (byte)Register.AK8963_MODULE_ADDRESS);           // Set the I2C slave address of AK8963 and set for write.
-            this.WriteByte(Register.I2C_SLV0_REG, (byte)Register.AK8963_CNTL);               // I2C slave 0 register address from where to begin data transfer 
-                                                                                             // Configure the magnetometer for continuous read and highest resolution
-                                                                                             // set Mscale bit 4 to 1 (0) to enable 16 (14) bit resolution in CNTL register,
-                                                                                             // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
-            this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mfs << 4 | (byte)this.Mmode));        // Set magnetometer data resolution and sample ODR
-            this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                     // Enable I2C and transfer 1 byte
+            this.WriteByte(Register.I2C_SLV0_REG, (byte)Register.AK8963_CNTL);                      // I2C slave 0 register address from where to begin data transfer 
+                                                                                                    // Configure the magnetometer for continuous read and highest resolution
+                                                                                                    // set Mscale bit 4 to 1 (0) to enable 16 (14) bit resolution in CNTL register,
+                                                                                                    // and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
+            this.WriteByte(Register.I2C_SLV0_DO, (byte)((byte)this._mfs << 4 | (byte)this.Mmode));  // Set magnetometer data resolution and sample ODR
+            this.WriteByte(Register.I2C_SLV0_CTRL, 0x81);                                           // Enable I2C and transfer 1 byte
             Hardware.Library.Delay(200);
 
             this.MagBias = new Core.Data.Vector3(

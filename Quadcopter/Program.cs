@@ -1,6 +1,6 @@
 ﻿#define ENABLE_LED
 // #define ENABLE_BUZZER
-#define ENABLE_MOTOR
+// #define ENABLE_MOTOR
 
 using System;
 
@@ -47,6 +47,9 @@ namespace Quadcopter
                 //     gyro.GyroBias.Z
                 // );
 
+                gyro.Initiailze();
+                gyro.InitiailzeSlave();
+
                 // System.Console.WriteLine("Wave device in a figure eight until done");
                 // gyro.CalibrateSlave();
                 // System.Console.WriteLine
@@ -61,8 +64,6 @@ namespace Quadcopter
                 // );
                 // System.Console.WriteLine("Mag Calibration done!");
 
-                gyro.Initiailze();
-                gyro.InitiailzeSlave();
 
                 // System.Console.WriteLine("Wave device in a figure eight until done");
                 // gyro.CalibrateSlave();
@@ -194,7 +195,7 @@ namespace Quadcopter
                     rearLeftSpeed = (short)Math.Min((ushort)rearLeftSpeed, thrust);
 
 
-                    // System.Console.Write(ahrs.EularAngles);
+                    System.Console.Write(ahrs.EularAngles);
                     System.Console.WriteLine
                     (
                         "\t {0} {1} {2} {3}",
@@ -228,7 +229,9 @@ namespace Quadcopter
 
                     var ticks = (DateTime.Now - start).Ticks;
                     var counter = 1000d * 10000d / ticks;
-                    if (counter < 650)
+
+                    // System.Console.WriteLine(counter);
+                    if (counter < 500)
                     {
                         System.Console.WriteLine(counter);
                         indicator.Status = Tron.Device.Indicator.IndicatorStatus.WRINING;
